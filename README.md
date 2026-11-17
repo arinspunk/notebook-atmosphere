@@ -56,11 +56,51 @@ Para **retirar** un mensaje:
 
 Si el PDS no responde, no se ve ninguna respuesta de otras cuentas.
 
+## Estilos
+
+CSS a secas, sin preprocesadores ni frameworks, en [`src/styles/`](src/styles/). `src/main.ts` importa `main.css`, y Vite genera una sola hoja en `dist/assets/`.
+
+```
+src/styles/
+  main.css          orden de las capas e imports
+  theme.css         tokens: colores, tipografía, espacios, radios, medidas
+  fonts.css         @font-face de las fuentes autoalojadas
+  base.css          reset mínimo y elementos sin clase
+  layout.css        contenedor de la página (.app)
+  components/       un fichero por bloque
+```
+
+Las capas, de menos a más prioridad, son `tokens`, `base`, `layout`, `components` y `utilities`. Una capa posterior gana a una anterior sea cual sea la especificidad.
+
+**Clases:** BEM en inglés (`bloque`, `bloque__elemento`, `bloque--modificador`), para que un fork las entienda sin saber galego. Los textos de la interfaz siguen en galego. Bloques:
+
+| Bloque | Qué es |
+| --- | --- |
+| `post` | Página de un dibujo: `__media`, `__image`, `__text`, `__byline`, `__stat` (`--likes`, `--shares`) |
+| `pager` | Anterior, índice y siguiente: `__link` (`--prev`, `--index`, `--next`) |
+| `replies` | Respuestas: `__thread` (cada tarjeta) y `__followups` (segundo nivel) |
+| `reply` | Una respuesta: `__header`, `__text`; `--followup` en el segundo nivel |
+| `post-list` | Índice: `__title`, `__items`, `__item` |
+| `post-card` | Un dibujo del índice: `__thumb`, `__image`, `__byline` |
+| `byline` | Nombre y fecha: `__name`, `__date`. Se combina con la clase del bloque que lo contiene (`post__byline byline`) |
+| `status` | Mensajes: `--loading`, `--error`, `--empty`, `--not-found` |
+
+Un test comprueba que todas las clases siguen la convención.
+
+**Cambiar el aspecto:** los valores están en `theme.css`; ahora son provisionales, parecidos a los del navegador. Los componentes solo usan esos tokens: un test falla si un componente usa un color literal (`#fff`, `rgb()`, `white`…). Los colores se nombran por función (`--color-bg`, `--color-accent`…), así que un modo oscuro solo tendría que redefinirlos en un `@media (prefers-color-scheme: dark)`.
+
+**Fuentes e imágenes propias:**
+- Las fuentes van en `src/assets/fonts/`, declaradas en `fonts.css`, y las imágenes en `src/assets/images/`.
+- Se enlazan con rutas relativas desde el CSS (`url("../assets/fonts/x.woff2")`) o con `import` desde TypeScript; Vite les añade un hash.
+- **Nada de URIs `data:`:** la CSP las bloquea. Vite está configurado para no generarlas (`assetsInlineLimit: 0`), pero tampoco hay que escribirlas a mano (`url("data:image/svg+xml,…")`): el SVG va como fichero.
+
+**Recursos externos:** la CSP de [`netlify.toml`](netlify.toml) solo admite lo propio del sitio. Para usar una fuente de Google Fonts o un CDN, añade su origen a la directiva que corresponda: `font-src` para fuentes, `style-src` para hojas, `img-src` para imágenes. Si no, el navegador lo bloquea en producción. `npm run dev` no aplica la CSP; `npm run build && npm run preview` sí, y así se ve el bloqueo en la consola antes de publicar.
+
 ## Probar
 
 ```sh
 npm test         # tests unitarios y de DOM (Vitest + jsdom)
-npm run check    # comprobación de tipos (tsc --noEmit)
+npm run check    # comprobación de tipos (tsc), del sitio y de vite.config.ts
 ```
 
 Las fixtures de `tests/fixtures/` son respuestas reales de la cuenta de pruebas, de los dos AppViews y del PDS.
@@ -69,10 +109,12 @@ Las fixtures de `tests/fixtures/` son respuestas reales de la cuenta de pruebas,
 
 ```sh
 npm run build    # comprueba los tipos y genera dist/
-npm run preview  # sirve dist/ en local para revisarlo
+npm run preview  # sirve dist/ en local, con la misma CSP que Netlify
 ```
 
-El sitio se publica en **Netlify**. [`netlify.toml`](netlify.toml) ya fija el comando de build (`npm run build`), la carpeta publicada (`dist`) y la versión de Node, así que no hay que configurar nada en el panel. Hay dos formas de publicar:
+El sitio se publica en **Netlify**. [`netlify.toml`](netlify.toml) ya fija el comando de build (`npm run build`), la carpeta publicada (`dist`) y la versión de Node, así que no hay que configurar nada en el panel. También define la **Content-Security-Policy**. Es la única definición: `npm run preview` la lee de ahí y `tests/csp.test.ts` la comprueba. Si cambias `pdsUrl` en `src/config.ts`, cambia también `connect-src`; si no, el test falla.
+
+Hay dos formas de publicar:
 
 - **Desde un repositorio Git:** en Netlify, "Add new site" → "Import an existing project" y elegir el repositorio. Cada push a la rama principal publica una versión nueva.
 - **Desde la terminal:** `npx netlify-cli deploy --build` crea un borrador para revisar, y `npx netlify-cli deploy --build --prod` lo publica. La primera vez pide iniciar sesión y vincular el sitio.

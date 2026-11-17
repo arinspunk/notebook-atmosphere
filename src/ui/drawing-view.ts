@@ -38,39 +38,46 @@ function renderImage(post: PostView): HTMLImageElement | null {
   const img = firstImage(post);
   const src = img?.fullsize ?? img?.thumb;
   if (!img || !isWebUrl(src)) return null;
-  const attrs: Record<string, string> = { src, alt: typeof img.alt === "string" ? img.alt : "" };
+  const attrs: Record<string, string> = { class: "post__image", src, alt: typeof img.alt === "string" ? img.alt : "" };
   const ar = img.aspectRatio;
   if (ar && ar.width > 0 && ar.height > 0) {
     // Reserva la proporción antes de que cargue.
     attrs.width = String(ar.width);
     attrs.height = String(ar.height);
-    attrs.style = `aspect-ratio: ${ar.width} / ${ar.height}`;
   }
-  return el("img", attrs);
+  const node = el("img", attrs);
+  // Por CSSOM y no con el atributo `style`: la CSP no permite estilos en línea.
+  if (ar && ar.width > 0 && ar.height > 0) node.style.aspectRatio = `${ar.width} / ${ar.height}`;
+  return node;
 }
 
 function renderNav(n: Neighbours, i18n: I18n): HTMLElement {
   return el(
     "nav",
-    { "aria-label": i18n.t("navLabel") },
-    n.older && el("a", { href: drawingHref(n.older.rkey), rel: "prev" }, i18n.t("previous")),
+    { class: "pager", "aria-label": i18n.t("navLabel") },
+    n.older && el("a", { class: "pager__link pager__link--prev", href: drawingHref(n.older.rkey), rel: "prev" }, i18n.t("previous")),
     " ",
-    el("a", { href: INDEX_HREF }, i18n.t("index")),
+    el("a", { class: "pager__link pager__link--index", href: INDEX_HREF }, i18n.t("index")),
     " ",
-    n.newer && el("a", { href: drawingHref(n.newer.rkey), rel: "next" }, i18n.t("next")),
+    n.newer && el("a", { class: "pager__link pager__link--next", href: drawingHref(n.newer.rkey), rel: "next" }, i18n.t("next")),
   );
 }
 
 /** Una respuesta: nombre, fecha y texto. Sin avatar, imágenes, embeds ni contadores. */
-export function renderReply(post: PostView, config: Config, i18n: I18n, now?: number): HTMLElement {
+export function renderReply(post: PostView, config: Config, i18n: I18n, now?: number, followup = false): HTMLElement {
   const own = post.author?.did === config.did;
   const record = post.record ?? {};
   const name = own
     ? (attributeName(record, config.nombres) ?? i18n.t("genericName"))
     : post.author?.displayName?.trim() || post.author?.handle || "";
   const segments = own ? cleanCadernoSegments(record) : facetSegments(record);
-  const text = segments.length ? el("p", { class: "texto" }, renderSegments(segments)) : null;
-  return el("article", { class: "resposta" }, el("header", {}, el("strong", {}, name), " ", renderTime(record.createdAt, i18n, now)), text);
+  const text = segments.length ? el("p", { class: "reply__text" }, renderSegments(segments)) : null;
+  return el(
+    "article",
+    { class: followup ? "reply reply--followup" : "reply" },
+    el("header", { class: "reply__header byline" }, el("strong", { class: "byline__name" }, name), " ", renderTime(record.createdAt, i18n, now, "byline__date")),
+    text,
+  );
 }
 
 /** Tarjetas de respuestas; `null` si no hay ninguna (sin avisos de pendientes). */
@@ -78,13 +85,13 @@ export function renderCards(cards: Card[], config: Config, i18n: I18n, now?: num
   if (!cards.length) return null;
   return el(
     "section",
-    { class: "respostas" },
+    { class: "replies" },
     ...cards.map((c) =>
       el(
         "div",
-        { class: "tarxeta" },
+        { class: "replies__thread" },
         renderReply(c.reply, config, i18n, now),
-        c.followups.length ? el("div", { class: "seguimento" }, ...c.followups.map((f) => renderReply(f, config, i18n, now))) : null,
+        c.followups.length ? el("div", { class: "replies__followups" }, ...c.followups.map((f) => renderReply(f, config, i18n, now, true))) : null,
       ),
     ),
   );
@@ -111,14 +118,24 @@ export function renderDrawingShell({ drawing, neighbours, config, i18n, now }: D
   const segments = cleanCadernoSegments(drawing.record);
   const ar = recordAspectRatio(drawing.record);
   // Hueco de la imagen con la proporción del record; sin ella, no se reserva nada.
-  let figure: HTMLElement | null = ar ? el("figure", { class: "imaxe", style: `aspect-ratio: ${ar.width} / ${ar.height}` }) : null;
+  let figure: HTMLElement | null = null;
+  if (ar) {
+    figure = el("figure", { class: "post__media" });
+    figure.style.aspectRatio = `${ar.width} / ${ar.height}`; // CSSOM: ver renderImage
+  }
   const nav = renderNav(neighbours, i18n);
   const element = el(
     "article",
-    { class: "debuxo" },
+    { class: "post" },
     figure,
-    segments.length ? el("p", { class: "texto" }, renderSegments(segments)) : null,
-    el("p", { class: "autoria" }, el("strong", {}, drawing.nombre ?? i18n.t("genericName")), " ", renderTime(drawing.record.createdAt, i18n, now)),
+    segments.length ? el("p", { class: "post__text" }, renderSegments(segments)) : null,
+    el(
+      "p",
+      { class: "post__byline byline" },
+      el("strong", { class: "byline__name" }, drawing.nombre ?? i18n.t("genericName")),
+      " ",
+      renderTime(drawing.record.createdAt, i18n, now, "byline__date"),
+    ),
     nav,
   );
 
@@ -135,20 +152,20 @@ export function renderDrawingShell({ drawing, neighbours, config, i18n, now }: D
     fill(post, cards) {
       const img = renderImage(post);
       if (img && figure) figure.append(img);
-      else replaceFigure(img && el("figure", { class: "imaxe" }, img));
+      else replaceFigure(img && el("figure", { class: "post__media" }, img));
       const likes = count(post.likeCount);
       const shared = count(post.repostCount) + count(post.quoteCount);
       nav.before(
         ...[
-          likes ? el("p", { class: "gustos" }, i18n.tn("likes", likes)) : null,
-          shared ? el("p", { class: "partilhas" }, i18n.tn("shared", shared)) : null,
+          likes ? el("p", { class: "post__stat post__stat--likes" }, i18n.tn("likes", likes)) : null,
+          shared ? el("p", { class: "post__stat post__stat--shares" }, i18n.tn("shared", shared)) : null,
         ].filter((n): n is HTMLParagraphElement => n !== null),
       );
       const section = renderCards(cards, config, i18n, now);
       if (section) element.append(section);
     },
     fail() {
-      replaceFigure(el("p", { class: "estado", role: "status" }, i18n.t("threadError")));
+      replaceFigure(el("p", { class: "status status--error", role: "status" }, i18n.t("threadError")));
     },
   };
 }

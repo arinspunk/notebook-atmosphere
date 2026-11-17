@@ -1,0 +1,9 @@
+/* Bloque `replies`: tarjetas de respuestas. */
+
+.replies__thread {
+  margin-block: var(--space-4);
+}
+
+.replies__followups {
+  margin-inline-start: var(--space-6);
+}

@@ -6,12 +6,19 @@
 [build.environment]
   NODE_VERSION = "22"
 
-# Content-Security-Policy (decisión 2 del diseño de caderno-mvp). Va como cabecera
-# y no como <meta> para no romper el HMR de `npm run dev` y para poder usar
-# frame-ancestors. Si cambian `pdsUrl` o `appviewUrl` en src/config.ts, hay que
-# actualizar connect-src. 'unsafe-inline' en style-src cubre el <style> de
-# index.html y el aspect-ratio que se pone en las imágenes.
+# Content-Security-Policy: única definición. `npm run preview` sirve esta misma
+# cabecera (vite.config.ts la lee de aquí) y un test comprueba la política.
+# Va como cabecera y no como <meta> para no romper el HMR de `npm run dev` y para
+# poder usar frame-ancestors.
+# - style-src sin 'unsafe-inline': los estilos van en hojas propias y la
+#   proporción de las imágenes se asigna por CSSOM.
+# - font-src e img-src con 'self': fuentes e imágenes propias del sitio (nunca
+#   como URIs data:). img-src admite además el CDN de imágenes del AppView.
+# - connect-src: el PDS de src/config.ts y los dos AppViews admitidos. Si cambia
+#   `pdsUrl`, hay que cambiarlo aquí (el test falla si no coinciden).
+# Para añadir un recurso externo (otra fuente, otro CDN), añade su origen a la
+# directiva que corresponda y revísalo con `npm run build && npm run preview`.
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src https://cdn.bsky.app; connect-src https://eurosky.social https://public.api.bsky.app https://api.blacksky.community; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'"
+    Content-Security-Policy = "default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' https://cdn.bsky.app; connect-src https://eurosky.social https://public.api.bsky.app https://api.blacksky.community; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'"

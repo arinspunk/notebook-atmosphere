@@ -37,6 +37,15 @@ function preloadWithImage(src: string): void {
   new Image().src = src;
 }
 
+/** Mensajes de estado de la app y modificador BEM del bloque `status` de cada uno. */
+const STATUS_MODIFIER = {
+  loading: "loading",
+  error: "error",
+  empty: "empty",
+  notFound: "not-found",
+} as const satisfies Partial<Record<SimpleKey, string>>;
+type StatusKey = keyof typeof STATUS_MODIFIER;
+
 /** Tiempo oculta a partir del cual la página se vuelve a cargar al volver. */
 export const BACKGROUND_RELOAD_MS = 10 * 60 * 1000;
 
@@ -55,7 +64,8 @@ export function startApp(root: HTMLElement, deps: AppDeps, win: Window = window)
   const preloadImage = deps.preloadImage ?? preloadWithImage;
   let generation = 0;
 
-  const message = (key: SimpleKey, ...extra: Node[]) => el("p", { class: "estado", role: "status" }, i18n.t(key), ...extra);
+  const message = (key: StatusKey, ...extra: Node[]) =>
+    el("p", { class: `status status--${STATUS_MODIFIER[key]}`, role: "status" }, i18n.t(key), ...extra);
 
   async function render(): Promise<void> {
     const gen = ++generation;

@@ -10,6 +10,8 @@ import { createI18n } from "../src/lib/i18n.ts";
 import type { PostRecord, PostView, RepoRecord } from "../src/lib/types.ts";
 import { parseRoute } from "../src/router.ts";
 import { renderDrawing, renderDrawingShell } from "../src/ui/drawing-view.ts";
+import { renderTime } from "../src/ui/dom.ts";
+import indexHtml from "../index.html?raw";
 import { loadThumbnails, renderIndex } from "../src/ui/index-view.ts";
 import drawingBsky from "./fixtures/drawing-thread-bsky.json";
 import drawingPosts from "./fixtures/drawing-posts-bsky.json";
@@ -94,14 +96,14 @@ describe("startApp (6.1)", () => {
   test("home: el dibujo más reciente, con estado de carga antes", async () => {
     const { root, loading } = await open("#/");
     expect(loading).toBe("A carregar…");
-    expect(root.querySelector(".autoria strong")?.textContent).toBe("León");
+    expect(root.querySelector(".post__byline strong")?.textContent).toBe("León");
   });
 
   test("#/d/<rkey>: ese dibujo (recargar mantiene el dibujo)", async () => {
     for (let i = 0; i < 2; i++) {
       const { root } = await open("#/d/3n2hlsmfo5k2w");
-      expect(root.querySelector(".autoria strong")?.textContent).toBe("Naia");
-      expect(root.querySelectorAll(".tarxeta")).toHaveLength(1);
+      expect(root.querySelector(".post__byline strong")?.textContent).toBe("Naia");
+      expect(root.querySelectorAll(".replies__thread")).toHaveLength(1);
     }
   });
 
@@ -136,7 +138,7 @@ describe("startApp (6.1)", () => {
     root.querySelector<HTMLAnchorElement>("a[rel=prev]")!.click();
     location.hash = "#/d/3n2hlsmfo5k2w";
     await app.render();
-    expect(root.querySelector(".autoria strong")?.textContent).toBe("Naia");
+    expect(root.querySelector(".post__byline strong")?.textContent).toBe("Naia");
   });
 });
 
@@ -198,13 +200,13 @@ describe("navegar entre dibujos (1.2)", () => {
     srv.state.slow = true;
     go(`#/d/${NAIA.rkey}`);
     expect(root.textContent).not.toContain("A carregar…");
-    expect(root.querySelector(".autoria strong")?.textContent).toBe("Naia");
-    expect(root.querySelector(".texto")?.textContent).toBe("Prova de desenho");
-    expect(root.querySelector("figure")?.getAttribute("style")).toBe("aspect-ratio: 1840 / 1380");
+    expect(root.querySelector(".post__byline strong")?.textContent).toBe("Naia");
+    expect(root.querySelector(".post__text")?.textContent).toBe("Prova de desenho");
+    expect(root.querySelector<HTMLElement>("figure")?.style.aspectRatio).toBe("1840 / 1380");
     expect(root.querySelector("figure img")).toBeNull();
-    expect(root.querySelector(".tarxeta")).toBeNull();
+    expect(root.querySelector(".replies__thread")).toBeNull();
     await srv.release(NAIA.rkey);
-    await vi.waitFor(() => expect(root.querySelectorAll(".tarxeta")).toHaveLength(1));
+    await vi.waitFor(() => expect(root.querySelectorAll(".replies__thread")).toHaveLength(1));
     expect(root.querySelector("figure img")).not.toBeNull();
   });
 
@@ -215,16 +217,16 @@ describe("navegar entre dibujos (1.2)", () => {
     go(`#/d/${NAIA.rkey}`);
     const naia = root.firstElementChild!;
     go(`#/d/${LEON}`);
-    expect(root.querySelector(".autoria strong")?.textContent).toBe("León");
+    expect(root.querySelector(".post__byline strong")?.textContent).toBe("León");
     await srv.release(LEON);
     await vi.waitFor(() => expect(root.querySelector("figure img")).not.toBeNull());
     await srv.release(NAIA.rkey); // el relleno tardío del primero
     await new Promise((r) => setTimeout(r, 20));
     expect(naia.querySelector("img")).toBeNull();
-    expect(naia.querySelector(".tarxeta")).toBeNull();
-    expect(root.querySelector(".autoria strong")?.textContent).toBe("León");
+    expect(naia.querySelector(".replies__thread")).toBeNull();
+    expect(root.querySelector(".post__byline strong")?.textContent).toBe("León");
     expect(root.querySelectorAll("figure")).toHaveLength(1);
-    expect(root.querySelector(".tarxeta")).toBeNull(); // el hilo de León no tiene respuestas
+    expect(root.querySelector(".replies__thread")).toBeNull(); // el hilo de León no tiene respuestas
   });
 
   test("con el hilo fallido se quedan el texto y las flechas", async () => {
@@ -236,7 +238,7 @@ describe("navegar entre dibujos (1.2)", () => {
     fail = true;
     go(`#/d/${NAIA.rkey}`);
     await vi.waitFor(() => expect(root.textContent).toContain("Não foi possível carregar este desenho."));
-    expect(root.querySelector(".autoria strong")?.textContent).toBe("Naia");
+    expect(root.querySelector(".post__byline strong")?.textContent).toBe("Naia");
     expect(root.querySelector("nav a[rel=next]")).not.toBeNull();
   });
 });
@@ -300,7 +302,7 @@ describe("precarga de vecinos (2.2)", () => {
     await t.render();
     await vi.waitFor(() => expect(t.threads(LEON)).toBe(1));
     t.go(`#/d/${LEON}`);
-    expect(t.root.querySelector(".autoria strong")?.textContent).toBe("León");
+    expect(t.root.querySelector(".post__byline strong")?.textContent).toBe("León");
     await t.srv.release(LEON);
     await vi.waitFor(() => expect(t.root.querySelector("figure img")).not.toBeNull());
     expect(t.threads(LEON)).toBe(1);
@@ -314,7 +316,7 @@ describe("precarga de vecinos (2.2)", () => {
     await t.settle();
     expect(t.threads(LEON)).toBe(1);
     expect(t.root.textContent).not.toContain("Não foi possível");
-    expect(t.root.querySelectorAll(".tarxeta")).toHaveLength(1); // Naia sigue intacta
+    expect(t.root.querySelectorAll(".replies__thread")).toHaveLength(1); // Naia sigue intacta
     t.srv.state.fail.clear();
     t.go(`#/d/${LEON}`);
     await vi.waitFor(() => expect(t.root.querySelector("figure img")).not.toBeNull());
@@ -372,7 +374,7 @@ describe("vuelta del segundo plano (3.1)", () => {
 
   test("oculta 11 min y vuelve: se vuelven a pedir el catálogo y el dibujo, y la respuesta ocultada no se ve", async () => {
     const t = await start();
-    expect(t.root.querySelectorAll(".tarxeta")).toHaveLength(1);
+    expect(t.root.querySelectorAll(".replies__thread")).toHaveLength(1);
     expect([t.catalogCalls(), t.threadCalls()]).toEqual([1, 1]);
     t.visibility("hidden");
     t.state.hide = true; // el cuaderno oculta la respuesta entretanto
@@ -381,7 +383,7 @@ describe("vuelta del segundo plano (3.1)", () => {
     expect(t.root.textContent).toBe("A carregar…");
     await vi.waitFor(() => expect(t.root.querySelector("figure img")).not.toBeNull());
     expect([t.catalogCalls(), t.threadCalls()]).toEqual([2, 2]);
-    expect(t.root.querySelector(".tarxeta")).toBeNull();
+    expect(t.root.querySelector(".replies__thread")).toBeNull();
     expect(t.root.textContent).not.toContain("chulo!");
   });
 
@@ -393,7 +395,7 @@ describe("vuelta del segundo plano (3.1)", () => {
     t.visibility("visible");
     await new Promise((r) => setTimeout(r, 10));
     expect(t.calls()).toBe(n);
-    expect(t.root.querySelectorAll(".tarxeta")).toHaveLength(1);
+    expect(t.root.querySelectorAll(".replies__thread")).toHaveLength(1);
   });
 
   test("pageshow con persisted tras 11 min hace lo mismo", async () => {
@@ -438,9 +440,9 @@ describe("renderDrawing (6.2)", () => {
     const img = el.querySelector("img")!;
     expect(img.alt).toBe("umha chispa de auto-colantes desenhados a mao");
     expect(img.getAttribute("width")).toBeTruthy();
-    expect(img.getAttribute("style")).toMatch(/aspect-ratio: \d+ \/ \d+/);
-    expect(el.querySelector(".texto")?.textContent).toBe("Prova de desenho");
-    expect(el.querySelector(".autoria strong")?.textContent).toBe("Naia");
+    expect(img.style.aspectRatio).toMatch(/^\d+ \/ \d+$/);
+    expect(el.querySelector(".post__text")?.textContent).toBe("Prova de desenho");
+    expect(el.querySelector(".post__byline strong")?.textContent).toBe("Naia");
     const time = el.querySelector("time")!;
     expect(time.textContent).toBe("há 2 d");
     expect(time.getAttribute("datetime")).toBe(new Date(NAIA.record.createdAt!).toISOString());
@@ -452,21 +454,21 @@ describe("renderDrawing (6.2)", () => {
     const el = render(rootPost(), evil);
     expect(el.querySelector("script")).toBeNull();
     expect(el.querySelectorAll("img")).toHaveLength(1);
-    expect(el.querySelector(".texto")?.textContent).toContain("<script>alert(1)</script>");
+    expect(el.querySelector(".post__text")?.textContent).toContain("<script>alert(1)</script>");
   });
 
   test("con 0 likes y 0 compartidos no hay contadores; sin replyCount", () => {
     const post = { ...rootPost(), likeCount: 0, repostCount: 0, quoteCount: 0, replyCount: 5 };
     const el = render(post);
-    expect(el.querySelector(".gustos")).toBeNull();
-    expect(el.querySelector(".partilhas")).toBeNull();
+    expect(el.querySelector(".post__stat--likes")).toBeNull();
+    expect(el.querySelector(".post__stat--shares")).toBeNull();
     expect(el.textContent).not.toContain("5");
   });
 
   test("contadores con plural", () => {
-    expect(render({ ...rootPost(), likeCount: 1 }).querySelector(".gustos")?.textContent).toBe("Fiz feliz a 1 amiga");
-    expect(render({ ...rootPost(), likeCount: 20 }).querySelector(".gustos")?.textContent).toBe("Fiz feliz a 20 amigas");
-    expect(render({ ...rootPost(), repostCount: 3, quoteCount: 1 }).querySelector(".partilhas")?.textContent).toBe("Partilhado 4 vezes");
+    expect(render({ ...rootPost(), likeCount: 1 }).querySelector(".post__stat--likes")?.textContent).toBe("Fiz feliz a 1 amiga");
+    expect(render({ ...rootPost(), likeCount: 20 }).querySelector(".post__stat--likes")?.textContent).toBe("Fiz feliz a 20 amigas");
+    expect(render({ ...rootPost(), repostCount: 3, quoteCount: 1 }).querySelector(".post__stat--shares")?.textContent).toBe("Partilhado 4 vezes");
   });
 
   test("solo la primera de varias imágenes; también en recordWithMedia", () => {
@@ -508,7 +510,7 @@ describe("renderDrawing (6.2)", () => {
         ],
       },
     };
-    const p = render(rootPost(), d).querySelector(".texto")!;
+    const p = render(rootPost(), d).querySelector(".post__text")!;
     expect(p.textContent).toBe("Na praia\nco avó https://example.org");
     expect(p.querySelector("a")?.getAttribute("href")).toBe("https://example.org");
   });
@@ -527,18 +529,18 @@ describe("pintado en dos fases (1.1)", () => {
   test("el hueco tiene la proporción del record antes de tener la imagen", () => {
     const s = shell();
     const fig = s.element.querySelector("figure")!;
-    expect(fig.getAttribute("style")).toBe("aspect-ratio: 1840 / 1380");
+    expect(fig.style.aspectRatio).toBe("1840 / 1380");
     expect(fig.querySelector("img")).toBeNull();
     expect(s.element.firstElementChild).toBe(fig); // el texto va debajo y no se desplaza
-    expect(s.element.querySelector(".texto")?.textContent).toBe("Prova de desenho");
-    expect(s.element.querySelector(".autoria strong")?.textContent).toBe("Naia");
+    expect(s.element.querySelector(".post__text")?.textContent).toBe("Prova de desenho");
+    expect(s.element.querySelector(".post__byline strong")?.textContent).toBe("Naia");
     expect(s.element.querySelector("nav a[rel=next]")).not.toBeNull();
   });
 
   test("también con recordWithMedia", () => {
     const media = NAIA.record.embed;
     const d: Drawing = { ...NAIA, record: { ...NAIA.record, embed: { $type: "app.bsky.embed.recordWithMedia", record: {}, media } } };
-    expect(shell(d).element.querySelector("figure")?.getAttribute("style")).toBe("aspect-ratio: 1840 / 1380");
+    expect(shell(d).element.querySelector<HTMLElement>("figure")?.style.aspectRatio).toBe("1840 / 1380");
   });
 
   test("un record sin aspectRatio no reserva hueco y no da errores", () => {
@@ -561,7 +563,7 @@ describe("pintado en dos fases (1.1)", () => {
     expect(s.element.querySelectorAll("figure")).toHaveLength(1);
     expect(s.element.querySelector("figure")).toBe(fig);
     expect(fig.querySelector("img")?.alt).toBe("umha chispa de auto-colantes desenhados a mao");
-    expect([...s.element.children].map((c) => c.className || c.tagName)).toEqual(["imaxe", "texto", "autoria", "gustos", "NAV", "respostas"]);
+    expect([...s.element.children].map((c) => c.classList[0])).toEqual(["post__media", "post__text", "post__byline", "post__stat", "pager", "replies"]);
   });
 
   test("post del AppView sin imagen: se quita el hueco", () => {
@@ -575,8 +577,8 @@ describe("pintado en dos fases (1.1)", () => {
     s.fail();
     expect(s.element.querySelector("figure")).toBeNull();
     expect(s.element.firstElementChild?.textContent).toBe("Não foi possível carregar este desenho.");
-    expect(s.element.querySelector(".texto")?.textContent).toBe("Prova de desenho");
-    expect(s.element.querySelector(".autoria strong")?.textContent).toBe("Naia");
+    expect(s.element.querySelector(".post__text")?.textContent).toBe("Prova de desenho");
+    expect(s.element.querySelector(".post__byline strong")?.textContent).toBe("Naia");
     expect(s.element.querySelector("nav a[rel=next]")).not.toBeNull();
     expect(s.element.querySelector('nav a[href="#/indice"]')).not.toBeNull();
   });
@@ -592,21 +594,21 @@ describe("tarjetas (6.3)", () => {
 
   test("una tarjeta con la respuesta y sus descendientes en un nivel con sangría", async () => {
     const el = await cardsEl();
-    const cards = el.querySelectorAll(".tarxeta");
+    const cards = el.querySelectorAll(".replies__thread");
     expect(cards).toHaveLength(1);
     const card = cards[0]!;
-    expect(card.querySelector(":scope > .resposta .texto")?.textContent).toBe("chulo!");
-    const followups = [...card.querySelectorAll(".seguimento > .resposta")];
-    expect(followups.map((f) => f.querySelector(".texto")?.textContent)).toEqual(["☠️", "👺", "obrigada!"]);
-    expect(card.querySelectorAll(".seguimento .seguimento")).toHaveLength(0);
+    expect(card.querySelector(":scope > .reply .reply__text")?.textContent).toBe("chulo!");
+    const followups = [...card.querySelectorAll(".replies__followups > .reply")];
+    expect(followups.map((f) => f.querySelector(".reply__text")?.textContent)).toEqual(["☠️", "👺", "obrigada!"]);
+    expect(card.querySelectorAll(".replies__followups .replies__followups")).toHaveLength(0);
   });
 
   test("nombres: displayName/handle ajeno, tag de la lista para el cuaderno; sin avatar ni imágenes", async () => {
     const el = await cardsEl();
-    const names = [...el.querySelectorAll(".resposta header strong")].map((s) => s.textContent);
+    const names = [...el.querySelectorAll(".reply header strong")].map((s) => s.textContent);
     expect(names.at(-1)).toBe("Naia");
     expect(names[0]).toBeTruthy();
-    expect(el.querySelector(".respostas img")).toBeNull();
+    expect(el.querySelector(".replies img")).toBeNull();
     expect(el.textContent).not.toContain("ocultada");
     expect(el.textContent).not.toContain("😍");
     expect(el.textContent).not.toContain("cumu?");
@@ -634,12 +636,12 @@ describe("tarjetas (6.3)", () => {
       },
     };
     const el = renderDrawing({ drawing: NAIA, post: rootPost(), neighbours: findDrawing(catalog, NAIA.rkey), cards: [{ reply, followups: [] }], config: CONFIG, i18n, now: NOW });
-    const links = [...el.querySelectorAll(".respostas a")];
+    const links = [...el.querySelectorAll(".replies a")];
     expect(links).toHaveLength(1);
     expect(links[0]?.getAttribute("href")).toBe("https://example.org");
     expect(links[0]?.getAttribute("target")).toBe("_blank");
     expect(links[0]?.getAttribute("rel")).toBe("noopener noreferrer");
-    expect(el.querySelector(".resposta header strong")?.textContent).toBe("luzia.bsky.social");
+    expect(el.querySelector(".reply header strong")?.textContent).toBe("luzia.bsky.social");
   });
 
   test("respuesta con texto e imagen: solo el texto; respuesta sin texto: nombre y fecha", () => {
@@ -653,17 +655,17 @@ describe("tarjetas (6.3)", () => {
     } as PostView;
     const empty: PostView = { ...base, uri: "at://x/app.bsky.feed.post/e", cid: "c2", record: { text: "", createdAt: new Date(NOW - 3600_000).toISOString() } } as PostView;
     const el = renderDrawing({ drawing: NAIA, post: rootPost(), neighbours: findDrawing(catalog, NAIA.rkey), cards: [{ reply: withImage, followups: [empty] }], config: CONFIG, i18n, now: NOW });
-    const replies = [...el.querySelectorAll(".resposta")];
-    expect(el.querySelector(".respostas img")).toBeNull();
-    expect(replies[0]?.querySelector(".texto")?.textContent).toBe("mira!");
-    expect(replies[1]?.querySelector(".texto")).toBeNull();
+    const replies = [...el.querySelectorAll(".reply")];
+    expect(el.querySelector(".replies img")).toBeNull();
+    expect(replies[0]?.querySelector(".reply__text")?.textContent).toBe("mira!");
+    expect(replies[1]?.querySelector(".reply__text")).toBeNull();
     expect(replies[1]?.querySelector("strong")?.textContent).toBe("Luzia");
     expect(replies[1]?.querySelector("time")?.textContent).toBe("há 1 h");
   });
 
   test("sin respuestas visibles: sin tarjetas ni avisos", () => {
     const el = renderDrawing({ drawing: NAIA, post: rootPost(), neighbours: findDrawing(catalog, NAIA.rkey), cards: [], config: CONFIG, i18n, now: NOW });
-    expect(el.querySelector(".respostas")).toBeNull();
+    expect(el.querySelector(".replies")).toBeNull();
     expect(el.textContent).not.toMatch(/pendente|oculta/i);
   });
 });
@@ -715,5 +717,169 @@ describe("índice (6.4)", () => {
     await loadThumbnails(CONFIG, fn, view);
     expect(view.element.querySelectorAll("li")).toHaveLength(3);
     expect(view.element.querySelector("img")).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Clases BEM y estilos (change arquitectura-estilos)
+// ---------------------------------------------------------------------------
+
+/** Patrón BEM en inglés: bloque, `__elemento` y `--modificador` opcionales, en kebab-case. */
+const BEM = /^[a-z][a-z0-9]*(-[a-z0-9]+)*(__[a-z0-9]+(-[a-z0-9]+)*)?(--[a-z0-9]+(-[a-z0-9]+)*)?$/;
+/** Clases anteriores en galego: no pueden volver ni como bloque, elemento o modificador. */
+const OLD_CLASSES = ["debuxo", "imaxe", "texto", "autoria", "gustos", "partilhas", "respostas", "tarxeta", "seguimento", "resposta", "indice", "miniatura", "estado"];
+
+/** Clases de `root` (incluido) que no cumplen la convención. */
+function badClasses(root: Element): string[] {
+  const classes = new Set<string>();
+  for (const node of [root, ...root.querySelectorAll("[class]")]) node.classList.forEach((c) => classes.add(c));
+  return [...classes].filter((c) => !BEM.test(c) || c.split(/__|--/).some((part) => OLD_CLASSES.includes(part)));
+}
+
+/** Todos los nombres de color de CSS. */
+const NAMED_COLORS = new Set(
+  (
+    "aliceblue antiquewhite aqua aquamarine azure beige bisque black blanchedalmond blue blueviolet brown burlywood cadetblue chartreuse " +
+    "chocolate coral cornflowerblue cornsilk crimson cyan darkblue darkcyan darkgoldenrod darkgray darkgreen darkgrey darkkhaki darkmagenta " +
+    "darkolivegreen darkorange darkorchid darkred darksalmon darkseagreen darkslateblue darkslategray darkslategrey darkturquoise darkviolet " +
+    "deeppink deepskyblue dimgray dimgrey dodgerblue firebrick floralwhite forestgreen fuchsia gainsboro ghostwhite gold goldenrod gray green " +
+    "greenyellow grey honeydew hotpink indianred indigo ivory khaki lavender lavenderblush lawngreen lemonchiffon lightblue lightcoral " +
+    "lightcyan lightgoldenrodyellow lightgray lightgreen lightgrey lightpink lightsalmon lightseagreen lightskyblue lightslategray " +
+    "lightslategrey lightsteelblue lightyellow lime limegreen linen magenta maroon mediumaquamarine mediumblue mediumorchid mediumpurple " +
+    "mediumseagreen mediumslateblue mediumspringgreen mediumturquoise mediumvioletred midnightblue mintcream mistyrose moccasin navajowhite " +
+    "navy oldlace olive olivedrab orange orangered orchid palegoldenrod palegreen paleturquoise palevioletred papayawhip peachpuff peru pink " +
+    "plum powderblue purple rebeccapurple red rosybrown royalblue saddlebrown salmon sandybrown seagreen seashell sienna silver skyblue " +
+    "slateblue slategray slategrey snow springgreen steelblue tan teal thistle tomato turquoise violet wheat white whitesmoke yellow yellowgreen"
+  ).split(" "),
+);
+
+/** Colores literales en las declaraciones de `css` (sin contar los `var(...)`). */
+function literalColors(css: string): string[] {
+  const found: string[] = [];
+  const clean = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  for (const m of clean.matchAll(/(?:^|[;{])\s*([a-z-]+)\s*:\s*([^;{}]+)(?=[;}])/g)) {
+    const value = m[2]!.replace(/var\([^)]*\)/g, "").toLowerCase();
+    found.push(...(value.match(/#[0-9a-f]{3,8}\b/g) ?? []));
+    found.push(...(value.match(/\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/g) ?? []));
+    found.push(...(value.match(/[a-z]+/g) ?? []).filter((w) => NAMED_COLORS.has(w)));
+  }
+  return found;
+}
+
+describe("clases BEM y estilos", () => {
+  let stop: (() => void) | undefined;
+  afterEach(() => {
+    stop?.();
+    location.hash = "";
+  });
+  async function open(hash: string, fetchFn = server().fn) {
+    location.hash = hash;
+    const root = document.createElement("main");
+    const app = startApp(root, { config: CONFIG, fetchFn, storage: null, now: () => NOW });
+    stop = app.stop;
+    const done = app.render();
+    const loading = root.cloneNode(true) as Element;
+    await done;
+    return { root, loading };
+  }
+  /** Dibujo de Naia con vecinos a los dos lados, likes, compartidos y la tarjeta real con seguimiento. */
+  async function fullDrawing() {
+    const data = await loadDrawing({ config: CONFIG, fetchFn: server().fn, storage: null, rkey: NAIA.rkey, now: NOW });
+    if (data.state !== "ok") throw new Error("hilo");
+    const leon = catalog.find((d) => d.rkey === LEON)!;
+    const post = { ...data.post, likeCount: 3, repostCount: 1 };
+    return renderDrawing({ drawing: NAIA, post, neighbours: { older: leon, current: NAIA, newer: leon }, cards: data.cards, config: CONFIG, i18n, now: NOW });
+  }
+
+  test("renderTime: con clase la pone en el <time>; sin ella, sin atributo class", () => {
+    const iso = new Date(NOW - 3600_000).toISOString();
+    expect(renderTime(iso, i18n, NOW, "byline__date")?.className).toBe("byline__date");
+    expect(renderTime(iso, i18n, NOW)?.hasAttribute("class")).toBe(false);
+  });
+
+  test("dibujo completo: bloques post y pager", async () => {
+    const el = await fullDrawing();
+    for (const sel of [".post", ".post__media", ".post__image", ".post__text", ".post__byline", ".post__stat--likes", ".post__stat--shares", ".pager__link--prev", ".pager__link--index", ".pager__link--next"]) {
+      expect(el.matches(sel) || el.querySelector(sel) !== null, sel).toBe(true);
+    }
+    expect(el.querySelector(".post__stat--likes")?.textContent).toBe("Fiz feliz a 3 amigas"); // los textos siguen en galego
+  });
+
+  test("primer dibujo: sin pager__link--prev y con pager__link--index", () => {
+    const el = renderDrawing({ drawing: NAIA, post: rootPost(), neighbours: findDrawing(catalog, NAIA.rkey), cards: [], config: CONFIG, i18n, now: NOW });
+    expect(el.querySelector(".pager__link--prev")).toBeNull();
+    expect(el.querySelector(".pager__link--index")).not.toBeNull();
+  });
+
+  test("tarjeta con seguimiento: replies__thread > reply + replies__followups > reply--followup", async () => {
+    const thread = (await fullDrawing()).querySelector(".replies .replies__thread")!;
+    expect(thread.querySelector(":scope > .reply:not(.reply--followup)")).not.toBeNull();
+    const followups = thread.querySelectorAll(":scope > .replies__followups > .reply.reply--followup");
+    expect(followups.length).toBeGreaterThan(0);
+  });
+
+  test("byline compartido en dibujo, respuestas e índice", async () => {
+    const el = await fullDrawing();
+    const post = el.querySelector(".post__byline")!;
+    expect(post.classList.contains("byline")).toBe(true);
+    expect(post.querySelector(".byline__name")?.textContent).toBe("Naia");
+    expect(post.querySelector("time.byline__date")).not.toBeNull();
+    for (const header of el.querySelectorAll(".reply > header")) {
+      expect([...header.classList]).toEqual(["reply__header", "byline"]);
+      expect(header.querySelector(".byline__name")).not.toBeNull();
+      expect(header.querySelector("time.byline__date")).not.toBeNull();
+    }
+  });
+
+  test("índice con dos dibujos: post-list__item > post-card con thumb y byline", async () => {
+    const view = renderIndex(catalog, i18n, NOW);
+    expect(view.element.matches(".post-list")).toBe(true);
+    expect(view.element.querySelector(".post-list__title")).not.toBeNull();
+    const items = view.element.querySelectorAll(".post-list__items > .post-list__item");
+    expect(items).toHaveLength(2);
+    for (const item of items) {
+      const card = item.querySelector(":scope > .post-card")!;
+      expect(card.querySelector(".post-card__thumb")).not.toBeNull();
+      expect(card.querySelector(".post-card__byline.byline .byline__name")).not.toBeNull();
+    }
+    await loadThumbnails(CONFIG, mockFetch(() => json(drawingPosts)).fn, view);
+    expect(badClasses(view.element)).toEqual([]);
+  });
+
+  test("mensajes de estado con su modificador", async () => {
+    const loading = await open("#/");
+    expect(loading.loading.querySelector(".status.status--loading")).not.toBeNull();
+    const notFound = await open("#/d/3mwso7oovnp2u");
+    expect(notFound.root.querySelector(".status.status--not-found")?.textContent).toContain("Este desenho não existe.");
+    const empty = await open("#/", server({ catalog: () => json({ records: [] }) }).fn);
+    expect(empty.root.querySelector(".status.status--empty")).not.toBeNull();
+    const error = await open("#/", server({ catalog: () => json({ error: "x" }, 500) }).fn);
+    expect(error.root.querySelector(".status.status--error")).not.toBeNull();
+    const threadError = await open(`#/d/${NAIA.rkey}`, server({ thread: () => json({ error: "x" }, 500) }).fn);
+    expect(threadError.root.querySelector(".status.status--error")?.textContent).toBe("Não foi possível carregar este desenho.");
+    for (const r of [loading.loading, notFound.root, empty.root, error.root, threadError.root]) expect(badClasses(r)).toEqual([]);
+  });
+
+  test("todas las clases del dibujo cumplen BEM; el comprobador rechaza las anteriores", async () => {
+    expect(badClasses(await fullDrawing())).toEqual([]);
+    const probe = document.createElement("div");
+    probe.innerHTML = '<p class="debuxo"></p><p class="post__texto"></p><p class="Post"></p><p class="post_text"></p>';
+    expect(badClasses(probe)).toEqual(["debuxo", "post__texto", "Post", "post_text"]);
+  });
+
+  test("index.html no tiene estilos en línea", () => {
+    expect(indexHtml).toContain('<main id="app"');
+    expect(indexHtml).not.toMatch(/<style[\s>]/i);
+    expect(indexHtml).not.toMatch(/\sstyle\s*=/i);
+  });
+
+  test("los componentes no usan colores literales; el comprobador los detecta", () => {
+    const files = import.meta.glob<string>("../src/styles/components/*.css", { query: "?raw", import: "default", eager: true });
+    expect(Object.keys(files).length).toBe(8);
+    for (const [f, css] of Object.entries(files)) expect(literalColors(css), f).toEqual([]);
+    expect(literalColors(".x { color: white; }")).toEqual(["white"]);
+    expect(literalColors(".x { border: 1px solid #ABC; background: rgb(0 0 0); outline-color: oklch(0.5 0.1 200) }")).toEqual(["#abc", "rgb(", "oklch("]);
+    expect(literalColors(".x { color: var(--color-text); border-color: currentColor; background: transparent; /* red */ }")).toEqual([]);
+    expect(literalColors(".white a:hover { color: inherit; }")).toEqual([]);
   });
 });

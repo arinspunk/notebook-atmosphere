@@ -1,3 +1,4 @@
+import "./styles/main.css";
 import { startApp } from "./app.ts";
 import { config } from "./config.ts";
 import { safeLocalStorage } from "./likes.ts";

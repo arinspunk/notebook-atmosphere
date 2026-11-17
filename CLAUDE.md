@@ -22,7 +22,7 @@ Sitio estático (TypeScript + Vite, sin framework ni backend) que muestra los di
 
 - CSS a secas en `src/styles/`, ordenado con `@layer` (tokens, base, layout, components, utilities); un fichero por componente.
 - Clases BEM en inglés (`post`, `pager`, `replies`, `reply`, `post-list`, `post-card`, `byline`, `status`). Nunca las antiguas en galego.
-- Los componentes solo usan tokens semánticos de `tokens.css`: ningún color literal (hex, `rgb()`, nombres de color…).
+- Los componentes solo usan tokens semánticos de `theme.css`: ningún color literal (hex, `rgb()`, nombres de color…).
 - Fuentes e imágenes propias en `src/assets/`, nunca como URI `data:`.
 
 ## Particularidades conocidas

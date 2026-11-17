@@ -50,12 +50,17 @@ export function renderSegments(segments: TextSegment[]): DocumentFragment {
   return frag;
 }
 
-/** `<time>` con la fecha relativa, `datetime` y la fecha absoluta en `title`; `null` si la fecha no es válida. */
-export function renderTime(iso: string | undefined, i18n: I18n, now: number = Date.now()): HTMLTimeElement | null {
+/**
+ * `<time>` con la fecha relativa, `datetime` y la fecha absoluta en `title`;
+ * `null` si la fecha no es válida. `className`, si se da, va en `class`.
+ */
+export function renderTime(iso: string | undefined, i18n: I18n, now: number = Date.now(), className?: string): HTMLTimeElement | null {
   if (!isValidDate(iso)) return null;
+  const attrs: Record<string, string> = { datetime: new Date(iso).toISOString(), title: formatAbsoluteDate(iso, i18n.locale) };
+  if (className) attrs.class = className;
   return el(
     "time",
-    { datetime: new Date(iso).toISOString(), title: formatAbsoluteDate(iso, i18n.locale) },
+    attrs,
     formatRelativeTime(iso, i18n, now),
   );
 }

@@ -1,0 +1,19 @@
+/* Bloque `post`: la página de un dibujo. */
+
+.post__media {
+  margin: 0;
+}
+
+.post__image {
+  display: block;
+  width: 100%;
+}
+
+.post__text {
+  white-space: pre-line;
+}
+
+.post__byline,
+.post__stat {
+  margin-block: var(--space-2);
+}

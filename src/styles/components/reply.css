@@ -1,0 +1,10 @@
+/* Bloque `reply`: una respuesta. `reply--followup` en el segundo nivel. */
+
+.reply {
+  margin-block: var(--space-2);
+}
+
+.reply__text {
+  margin-block: var(--space-1);
+  white-space: pre-line;
+}

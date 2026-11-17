@@ -21,15 +21,29 @@ export interface IndexView {
 export function renderIndex(catalog: Drawing[], i18n: I18n, now?: number): IndexView {
   const slots = new Map<string, HTMLElement>();
   const items = catalog.map((d) => {
-    const slot = el("span", { class: "miniatura" });
+    const slot = el("span", { class: "post-card__thumb" });
     slots.set(d.uri, slot);
     return el(
       "li",
-      {},
-      el("a", { href: drawingHref(d.rkey) }, slot, el("strong", {}, d.nombre ?? i18n.t("genericName")), " ", renderTime(d.record.createdAt, i18n, now)),
+      { class: "post-list__item" },
+      el(
+        "a",
+        { class: "post-card", href: drawingHref(d.rkey) },
+        slot,
+        el(
+          "span",
+          { class: "post-card__byline byline" },
+          el("strong", { class: "byline__name" }, d.nombre ?? i18n.t("genericName")),
+          " ",
+          renderTime(d.record.createdAt, i18n, now, "byline__date"),
+        ),
+      ),
     );
   });
-  return { element: el("section", { class: "indice" }, el("h1", {}, i18n.t("index")), el("ol", {}, ...items)), slots };
+  return {
+    element: el("section", { class: "post-list" }, el("h1", { class: "post-list__title" }, i18n.t("index")), el("ol", { class: "post-list__items" }, ...items)),
+    slots,
+  };
 }
 
 /**
@@ -48,10 +62,11 @@ export async function loadThumbnails(config: Config, fetchFn: FetchFn, view: Ind
     const img = firstImage(post);
     const src = img?.thumb ?? img?.fullsize;
     if (!slot || !img || !isWebUrl(src)) continue;
-    const attrs: Record<string, string> = { src, alt: typeof img.alt === "string" ? img.alt : "", loading: "lazy" };
+    const node = el("img", { class: "post-card__image", src, alt: typeof img.alt === "string" ? img.alt : "", loading: "lazy" });
     if (img.aspectRatio && img.aspectRatio.width > 0 && img.aspectRatio.height > 0) {
-      attrs.style = `aspect-ratio: ${img.aspectRatio.width} / ${img.aspectRatio.height}`;
+      // Por CSSOM y no con el atributo `style`: la CSP no permite estilos en línea.
+      node.style.aspectRatio = `${img.aspectRatio.width} / ${img.aspectRatio.height}`;
     }
-    slot.replaceChildren(el("img", attrs));
+    slot.replaceChildren(node);
   }
 }

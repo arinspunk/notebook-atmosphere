@@ -1,0 +1,17 @@
+/* Bloque `post-card`: un dibujo en el índice. */
+
+.post-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.post-card__thumb {
+  flex: none;
+  width: var(--thumb-size);
+}
+
+.post-card__image {
+  display: block;
+  width: 100%;
+}

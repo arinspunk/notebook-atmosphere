@@ -1,0 +1,10 @@
+/* Bloque `post-list`: el índice. */
+
+.post-list__items {
+  list-style: none;
+  padding: 0;
+}
+
+.post-list__item {
+  margin-block: var(--space-3);
+}

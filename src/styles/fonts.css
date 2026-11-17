@@ -1,0 +1,17 @@
+/*
+ * Fuentes autoalojadas. Los ficheros .woff2 van en `src/assets/fonts/` y se
+ * enlazan con rutas relativas a este fichero; Vite les añade un hash. La CSP
+ * (`font-src 'self'`) no permite fuentes de otros orígenes ni URIs `data:`.
+ *
+ * Patrón:
+ *
+ * @font-face {
+ *   font-family: "Nombre";
+ *   src: url("../assets/fonts/nombre-regular.woff2") format("woff2");
+ *   font-weight: 400;
+ *   font-style: normal;
+ *   font-display: swap;
+ * }
+ *
+ * Después, en theme.css: --font-body: "Nombre", system-ui, sans-serif;
+ */

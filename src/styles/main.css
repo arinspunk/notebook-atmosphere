@@ -1,0 +1,25 @@
+/*
+ * Hoja de estilos del sitio. El orden de las capas marca la precedencia:
+ * una capa posterior gana a una anterior, sea cual sea la especificidad.
+ *
+ * - tokens:     propiedades personalizadas (colores, tipografía, espacios…).
+ * - base:       reset mínimo y elementos HTML sin clase.
+ * - layout:     contenedor de la página (`.app`).
+ * - components: un fichero por bloque BEM.
+ * - utilities:  reservada; sin fichero por ahora.
+ */
+
+@layer tokens, base, layout, components, utilities;
+
+@import "./theme.css" layer(tokens);
+@import "./fonts.css" layer(base);
+@import "./base.css" layer(base);
+@import "./layout.css" layer(layout);
+@import "./components/byline.css" layer(components);
+@import "./components/post.css" layer(components);
+@import "./components/pager.css" layer(components);
+@import "./components/replies.css" layer(components);
+@import "./components/reply.css" layer(components);
+@import "./components/post-list.css" layer(components);
+@import "./components/post-card.css" layer(components);
+@import "./components/status.css" layer(components);

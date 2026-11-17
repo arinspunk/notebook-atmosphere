@@ -1,0 +1,8 @@
+/* Bloque `pager`: anterior, índice y siguiente. */
+
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-block: var(--space-5);
+}

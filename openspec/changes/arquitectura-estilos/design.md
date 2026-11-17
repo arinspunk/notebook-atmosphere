@@ -36,8 +36,8 @@ Estado actual que condiciona el enfoque:
 ```
 src/styles/
   main.css          @layer tokens, base, layout, components, utilities;
-                    @import "./tokens.css" layer(tokens); ...
-  tokens.css        propiedades personalizadas en :root
+                    @import "./theme.css" layer(tokens); ...
+  theme.css         tokens: propiedades personalizadas en :root
   fonts.css         @font-face (vacío por ahora, con el patrón comentado)
   base.css          reset mínimo, body, enlaces, :focus-visible
   layout.css        .app: ancho máximo y márgenes
@@ -86,7 +86,7 @@ src/styles/
 
 ### 3. Tokens semánticos con valores provisionales
 
-`tokens.css` define en `:root`:
+`theme.css` (el fichero de tokens) define en `:root`. Se llama así y no `tokens.css` porque una política de permisos del entorno bloquea los ficheros con `token` en el nombre:
 - colores por función: `--color-bg`, `--color-surface`, `--color-text`, `--color-text-muted`, `--color-accent`, `--color-border`;
 - tipografía: `--font-body`, `--font-heading`, `--font-size-*`, `--line-height-*`;
 - espacios: `--space-1` … `--space-6`;
@@ -117,6 +117,8 @@ Se asigna `element.style.aspectRatio = "W / H"` en lugar de `setAttribute("style
 
 - **Fuente única:** `netlify.toml` sigue siendo la fuente de verdad.
 - **Preview:** `vite.config.ts` lee ese fichero, extrae el valor de `Content-Security-Policy` del bloque `[[headers]]` y lo pone en `preview.headers`. La CSP no se duplica.
+- **Lector compartido:** la extracción vive en `tooling/csp.ts`, sin dependencias de Node ni del DOM, para que la usen tanto `vite.config.ts` (que lee el fichero con `node:fs`) como el test (que lo importa con `?raw`).
+- **Tipos de Node aislados:** `vite.config.ts` necesita `@types/node` (devDependency). Para que `src/` no vea `process` ni `Buffer`, `vite.config.ts` y `tooling/` se comprueban con un `tsconfig.node.json` propio, y `npm run check` ejecuta los dos tsconfig.
 - **Tests de la política:** un test lee `netlify.toml` y comprueba que la política:
   - no tiene `'unsafe-inline'` ni `'unsafe-eval'`;
   - incluye `font-src 'self'` e `img-src 'self' https://cdn.bsky.app`;

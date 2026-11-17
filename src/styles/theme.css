@@ -1,0 +1,47 @@
+/*
+ * Tokens de diseño. Es el primer fichero que hay que tocar para cambiar el
+ * aspecto del sitio.
+ *
+ * VALORES PROVISIONALES: parecidos a los del navegador. Se sustituirán por
+ * los del diseño de Figma.
+ *
+ * Los colores se nombran por función, no por tono, y los componentes solo
+ * usan estos tokens. Para un modo oscuro basta con redefinir los colores en
+ * un bloque `@media (prefers-color-scheme: dark) { :root { … } }`.
+ */
+
+:root {
+  /* Color */
+  --color-bg: #fff;
+  --color-surface: #fff;
+  --color-text: #000;
+  --color-text-muted: #555;
+  --color-accent: #0645ad;
+  --color-border: #ccc;
+
+  /* Tipografía */
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-heading: var(--font-body);
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 2rem;
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+
+  /* Espacios */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+
+  /* Radios */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+
+  /* Medidas */
+  --measure: 40rem;
+  --thumb-size: 6em;
+}

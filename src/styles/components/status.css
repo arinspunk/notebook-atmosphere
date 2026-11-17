@@ -1,0 +1,9 @@
+/* Bloque `status`: cargando, error, vacío o no encontrado. */
+
+.status {
+  color: var(--color-text-muted);
+}
+
+.status--error {
+  color: var(--color-text);
+}
