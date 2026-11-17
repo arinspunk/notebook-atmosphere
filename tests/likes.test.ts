@@ -158,4 +158,31 @@ describe("loadLikes", () => {
     p.set([A]);
     expect(has(await load(p, s, T0), B)).toBe(false);
   });
+
+  test("dos cargas a la vez comparten una sola lectura del PDS", async () => {
+    const p = pds([C, B, A]);
+    const s = memoryStorage();
+    const [m1, m2, m3] = await Promise.all([load(p, s, T0), load(p, s, T0), load(p, s, T0)]);
+    expect(p.calls).toHaveLength(3); // lo mismo que una sola carga completa (ver el primer test)
+    for (const m of [m1, m2, m3]) expect([has(m, A), has(m, B), has(m, C)]).toEqual([true, true, true]);
+  });
+
+  test("terminada una carga, la siguiente vuelve a leer", async () => {
+    const p = pds([B, A]);
+    const s = memoryStorage();
+    await load(p, s, T0);
+    const before = p.calls.length;
+    p.set([C, B, A]);
+    const m = await load(p, s, T0 + 1000);
+    expect(p.calls.length).toBeGreaterThan(before);
+    expect(has(m, C)).toBe(true);
+  });
+
+  test("con otro fetch no se comparte", async () => {
+    const p1 = pds([A]);
+    const p2 = pds([B]);
+    const [m1, m2] = await Promise.all([load(p1, null, T0), load(p2, null, T0)]);
+    expect([has(m1, A), has(m1, B)]).toEqual([true, false]);
+    expect([has(m2, A), has(m2, B)]).toEqual([false, true]);
+  });
 });

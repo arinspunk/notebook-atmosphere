@@ -112,8 +112,33 @@ export interface LoadLikesOptions {
   now?: number;
 }
 
-/** Mapa de likes del cuaderno. Nunca lanza: ante un fallo sin caché válida devuelve un mapa vacío. */
-export async function loadLikes({ did, pdsUrl, fetchFn, storage, now = Date.now() }: LoadLikesOptions): Promise<LikeMap> {
+/**
+ * Cargas en curso, por `fetch` y por cuaderno. El dibujo actual y la precarga
+ * de sus dos vecinos piden los likes a la vez; así comparten una sola lectura
+ * del PDS (y una sola recarga completa cuando toca). Solo se comparte lo que
+ * está en curso: en cuanto termina, la siguiente llamada vuelve a leer.
+ */
+const inFlight = new WeakMap<FetchFn, Map<string, Promise<LikeMap>>>();
+
+/**
+ * Mapa de likes del cuaderno. Nunca lanza: ante un fallo sin caché válida
+ * devuelve un mapa vacío. Si ya hay una carga en curso del mismo cuaderno con
+ * el mismo `fetch`, devuelve esa misma promesa.
+ */
+export function loadLikes(options: LoadLikesOptions): Promise<LikeMap> {
+  let byKey = inFlight.get(options.fetchFn);
+  if (!byKey) inFlight.set(options.fetchFn, (byKey = new Map()));
+  const key = `${options.pdsUrl}\n${options.did}`;
+  const pending = byKey.get(key);
+  if (pending) return pending;
+  const promise = loadLikesOnce(options).finally(() => {
+    if (byKey.get(key) === promise) byKey.delete(key);
+  });
+  byKey.set(key, promise);
+  return promise;
+}
+
+async function loadLikesOnce({ did, pdsUrl, fetchFn, storage, now = Date.now() }: LoadLikesOptions): Promise<LikeMap> {
   const key = cacheKey(did);
   const cache = readCache(storage, key);
   const fresh = cache !== null && now - cache.fullAt >= 0 && now - cache.fullAt < FULL_RELOAD_MS;
