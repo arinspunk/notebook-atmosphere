@@ -73,6 +73,7 @@ src/styles/
 | `section.indice` | `section.post-list`, con `h1.post-list__title`, `ol.post-list__items`, `li.post-list__item` |
 | `a` del índice | `a.post-card` |
 | `span.miniatura` | `span.post-card__thumb` |
+| `img` de la miniatura | `img.post-card__image` |
 | `strong` + `time` del índice | `span.post-card__byline.byline` que los envuelve |
 | `strong` del nombre (en todos) | `strong.byline__name` |
 | `time` (en todos) | `time.byline__date` |
