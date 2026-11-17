@@ -7,4 +7,5 @@
 .reply__text {
   margin-block: var(--space-1);
   white-space: pre-line;
+  overflow-wrap: anywhere; /* las URLs largas de respuestas ajenas no desbordan en móvil */
 }

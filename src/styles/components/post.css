@@ -11,6 +11,7 @@
 
 .post__text {
   white-space: pre-line;
+  overflow-wrap: anywhere; /* una URL larga no desborda en móvil */
 }
 
 .post__byline,
