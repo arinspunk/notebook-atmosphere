@@ -1,0 +1,12 @@
+{
+    "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.threadgate/3n2hlsmfo5k2w",
+    "cid": "bafyreifbqatbvsg62rk2hmhlmv2bdvfltuwy7pdki4ezoyqyj534fnnhf4",
+    "value": {
+        "post": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hlsmfo5k2w",
+        "$type": "app.bsky.feed.threadgate",
+        "createdAt": "2026-11-16T22:46:43.868Z",
+        "hiddenReplies": [
+            "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3n2hma6m3ak25"
+        ]
+    }
+}

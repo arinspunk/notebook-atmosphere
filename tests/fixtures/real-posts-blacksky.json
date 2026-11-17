@@ -1,0 +1,105 @@
+{
+    "posts": [
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3mwso7oovnp2u",
+            "cid": "bafyreidhlcrzl2i72zhenu3hkjf77aks2umwsuxelhnwovtqnqkm24m6oi",
+            "author": {
+                "did": "did:plc:t3q3ylsnsser3o74xz42sdqk",
+                "handle": "usoritual.com",
+                "displayName": "Uso ritual",
+                "associated": {
+                    "activitySubscription": {
+                        "allowSubscriptions": "followers"
+                    }
+                },
+                "labels": []
+            },
+            "record": {
+                "$type": "app.bsky.feed.post",
+                "createdAt": "2026-10-01T14:07:10.033Z",
+                "embed": {
+                    "$type": "app.bsky.embed.external",
+                    "external": {
+                        "description": "De momento o conte\u00fado \u00e9 fict\u00edcio \ud83e\udd13",
+                        "title": "Bem-vinda ao Uso Ritual, estamos a trabalhar no desenvolvimento do site",
+                        "uri": "https://usoritual.com/bem-vinda/"
+                    }
+                },
+                "langs": [
+                    "pt"
+                ],
+                "text": "Bem-vinda ao Uso Ritual, estamos a trabalhar no desenvolvimento do site"
+            },
+            "embed": {
+                "external": {
+                    "uri": "https://usoritual.com/bem-vinda/",
+                    "title": "Bem-vinda ao Uso Ritual, estamos a trabalhar no desenvolvimento do site",
+                    "description": "De momento o conte\u00fado \u00e9 fict\u00edcio \ud83e\udd13"
+                },
+                "$type": "app.bsky.embed.external#view"
+            },
+            "bookmarkCount": 0,
+            "replyCount": 2,
+            "repostCount": 0,
+            "likeCount": 0,
+            "quoteCount": 0,
+            "indexedAt": "2026-10-01T14:07:10.033Z",
+            "labels": []
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3mxz2gu4qgn23",
+            "cid": "bafyreie3dstxls7ib5xacvbnwf3nstljydjkuhpqsaagyhqvbkfaxs4an4",
+            "author": {
+                "did": "did:plc:t3q3ylsnsser3o74xz42sdqk",
+                "handle": "usoritual.com",
+                "displayName": "Uso ritual",
+                "associated": {
+                    "activitySubscription": {
+                        "allowSubscriptions": "followers"
+                    }
+                },
+                "labels": []
+            },
+            "record": {
+                "$type": "app.bsky.feed.post",
+                "createdAt": "2026-10-16T17:00:23.392Z",
+                "embed": {
+                    "$type": "app.bsky.embed.external",
+                    "external": {
+                        "description": "Welcome to atproto comments!",
+                        "thumb": {
+                            "$type": "blob",
+                            "ref": {
+                                "$link": "bafkreiamkhrhv2eejd4l7rqvkoiuivz6yhscxzwy753wieckuzdrmse6ly"
+                            },
+                            "mimeType": "image/png",
+                            "size": 360533
+                        },
+                        "title": "Hello world",
+                        "uri": "http://localhost:8888/2026/10/15/hello-world/"
+                    }
+                },
+                "langs": [
+                    "en"
+                ],
+                "text": "Publish to Eurosky!"
+            },
+            "embed": {
+                "external": {
+                    "uri": "http://localhost:8888/2026/10/15/hello-world/",
+                    "title": "Hello world",
+                    "description": "Welcome to atproto comments!",
+                    "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:t3q3ylsnsser3o74xz42sdqk/bafkreiamkhrhv2eejd4l7rqvkoiuivz6yhscxzwy753wieckuzdrmse6ly"
+                },
+                "$type": "app.bsky.embed.external#view"
+            },
+            "bookmarkCount": 0,
+            "replyCount": 1,
+            "repostCount": 0,
+            "likeCount": 0,
+            "quoteCount": 0,
+            "indexedAt": "2026-10-16T17:00:23.392Z",
+            "labels": []
+        }
+    ]
+}

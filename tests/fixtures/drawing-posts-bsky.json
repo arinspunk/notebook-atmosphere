@@ -1,0 +1,272 @@
+{
+    "posts": [
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hlsmfo5k2w",
+            "cid": "bafyreigwx2on3htkvaujbxid4v2skvn4pxuhggwib7y33fyosj5mzvnhhq",
+            "author": {
+                "did": "did:plc:t3q3ylsnsser3o74xz42sdqk",
+                "handle": "usoritual.com",
+                "displayName": "Uso ritual",
+                "associated": {
+                    "activitySubscription": {
+                        "allowSubscriptions": "followers"
+                    }
+                },
+                "labels": [],
+                "createdAt": "2026-10-17T23:44:46.464Z"
+            },
+            "record": {
+                "$type": "app.bsky.feed.post",
+                "createdAt": "2026-11-16T22:38:51.298Z",
+                "embed": {
+                    "$type": "app.bsky.embed.images",
+                    "images": [
+                        {
+                            "alt": "umha chispa de auto-colantes desenhados a mao",
+                            "aspectRatio": {
+                                "height": 1380,
+                                "width": 1840
+                            },
+                            "image": {
+                                "$type": "blob",
+                                "ref": {
+                                    "$link": "bafkreidatcvvth2fmbu5u76txh3u26brdy3xpmx7g6l5cmeybeysgzkxlm"
+                                },
+                                "mimeType": "image/jpeg",
+                                "size": 1674741
+                            }
+                        }
+                    ]
+                },
+                "facets": [
+                    {
+                        "features": [
+                            {
+                                "$type": "app.bsky.richtext.facet#tag",
+                                "tag": "caderno"
+                            }
+                        ],
+                        "index": {
+                            "byteEnd": 25,
+                            "byteStart": 17
+                        }
+                    },
+                    {
+                        "features": [
+                            {
+                                "$type": "app.bsky.richtext.facet#tag",
+                                "tag": "naia"
+                            }
+                        ],
+                        "index": {
+                            "byteEnd": 31,
+                            "byteStart": 26
+                        }
+                    }
+                ],
+                "langs": [
+                    "gl",
+                    "pt"
+                ],
+                "text": "Prova de desenho #caderno #naia"
+            },
+            "embed": {
+                "images": [
+                    {
+                        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:t3q3ylsnsser3o74xz42sdqk/bafkreidatcvvth2fmbu5u76txh3u26brdy3xpmx7g6l5cmeybeysgzkxlm",
+                        "fullsize": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:t3q3ylsnsser3o74xz42sdqk/bafkreidatcvvth2fmbu5u76txh3u26brdy3xpmx7g6l5cmeybeysgzkxlm",
+                        "alt": "umha chispa de auto-colantes desenhados a mao",
+                        "aspectRatio": {
+                            "height": 1380,
+                            "width": 1840
+                        }
+                    }
+                ],
+                "$type": "app.bsky.embed.images#view"
+            },
+            "bookmarkCount": 0,
+            "replyCount": 3,
+            "repostCount": 0,
+            "likeCount": 0,
+            "quoteCount": 0,
+            "indexedAt": "2026-11-16T22:38:54.855Z",
+            "labels": [],
+            "threadgate": {
+                "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.threadgate/3n2hlsmfo5k2w",
+                "cid": "bafyreifbqatbvsg62rk2hmhlmv2bdvfltuwy7pdki4ezoyqyj534fnnhf4",
+                "record": {
+                    "$type": "app.bsky.feed.threadgate",
+                    "createdAt": "2026-11-16T22:46:43.868Z",
+                    "hiddenReplies": [
+                        "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3n2hma6m3ak25"
+                    ],
+                    "post": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hlsmfo5k2w"
+                },
+                "lists": []
+            }
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hlw4u4k22y",
+            "cid": "bafyreifixnw2h3vo6qhc6kmu3dpdcdfmtxfuhs2pfmjxrslxulhu3ysyvy",
+            "author": {
+                "did": "did:plc:t3q3ylsnsser3o74xz42sdqk",
+                "handle": "usoritual.com",
+                "displayName": "Uso ritual",
+                "associated": {
+                    "activitySubscription": {
+                        "allowSubscriptions": "followers"
+                    }
+                },
+                "labels": [],
+                "createdAt": "2026-10-17T23:44:46.464Z"
+            },
+            "record": {
+                "$type": "app.bsky.feed.post",
+                "createdAt": "2026-11-16T22:40:49.212Z",
+                "embed": {
+                    "$type": "app.bsky.embed.images",
+                    "images": [
+                        {
+                            "alt": "arte",
+                            "aspectRatio": {
+                                "height": 1320,
+                                "width": 1840
+                            },
+                            "image": {
+                                "$type": "blob",
+                                "ref": {
+                                    "$link": "bafkreib2nupr7rfjyzctyvqcisy4d752dsvkgh5dym2hhpupb2tyqb4aqm"
+                                },
+                                "mimeType": "image/jpeg",
+                                "size": 1570743
+                            }
+                        },
+                        {
+                            "alt": "lambetadas",
+                            "aspectRatio": {
+                                "height": 1380,
+                                "width": 1840
+                            },
+                            "image": {
+                                "$type": "blob",
+                                "ref": {
+                                    "$link": "bafkreidatcvvth2fmbu5u76txh3u26brdy3xpmx7g6l5cmeybeysgzkxlm"
+                                },
+                                "mimeType": "image/jpeg",
+                                "size": 1674741
+                            }
+                        }
+                    ]
+                },
+                "facets": [
+                    {
+                        "features": [
+                            {
+                                "$type": "app.bsky.richtext.facet#tag",
+                                "tag": "caderno"
+                            }
+                        ],
+                        "index": {
+                            "byteEnd": 21,
+                            "byteStart": 13
+                        }
+                    },
+                    {
+                        "features": [
+                            {
+                                "$type": "app.bsky.richtext.facet#tag",
+                                "tag": "leon"
+                            }
+                        ],
+                        "index": {
+                            "byteEnd": 27,
+                            "byteStart": 22
+                        }
+                    }
+                ],
+                "langs": [
+                    "gl",
+                    "pt"
+                ],
+                "text": "Outro debuxo #caderno #leon"
+            },
+            "embed": {
+                "images": [
+                    {
+                        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:t3q3ylsnsser3o74xz42sdqk/bafkreib2nupr7rfjyzctyvqcisy4d752dsvkgh5dym2hhpupb2tyqb4aqm",
+                        "fullsize": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:t3q3ylsnsser3o74xz42sdqk/bafkreib2nupr7rfjyzctyvqcisy4d752dsvkgh5dym2hhpupb2tyqb4aqm",
+                        "alt": "arte",
+                        "aspectRatio": {
+                            "height": 1320,
+                            "width": 1840
+                        }
+                    },
+                    {
+                        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:t3q3ylsnsser3o74xz42sdqk/bafkreidatcvvth2fmbu5u76txh3u26brdy3xpmx7g6l5cmeybeysgzkxlm",
+                        "fullsize": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:t3q3ylsnsser3o74xz42sdqk/bafkreidatcvvth2fmbu5u76txh3u26brdy3xpmx7g6l5cmeybeysgzkxlm",
+                        "alt": "lambetadas",
+                        "aspectRatio": {
+                            "height": 1380,
+                            "width": 1840
+                        }
+                    }
+                ],
+                "$type": "app.bsky.embed.images#view"
+            },
+            "bookmarkCount": 0,
+            "replyCount": 0,
+            "repostCount": 0,
+            "likeCount": 0,
+            "quoteCount": 0,
+            "indexedAt": "2026-11-16T22:40:56.343Z",
+            "labels": []
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3my3zz36oe42v",
+            "cid": "bafyreihffa3xt7sz3noi4rxbfmubeme7h4otv5w6ruexcfoyn5i7n3xsua",
+            "author": {
+                "did": "did:plc:t3q3ylsnsser3o74xz42sdqk",
+                "handle": "usoritual.com",
+                "displayName": "Uso ritual",
+                "associated": {
+                    "activitySubscription": {
+                        "allowSubscriptions": "followers"
+                    }
+                },
+                "labels": [],
+                "createdAt": "2026-10-17T23:44:46.464Z"
+            },
+            "record": {
+                "$type": "app.bsky.feed.post",
+                "createdAt": "2026-10-17T21:30:40.221Z",
+                "embed": {
+                    "$type": "app.bsky.embed.external",
+                    "external": {
+                        "description": "\u30bf\u30b3\uff08\u86f8\u3001\u9bb9\u3001\u7ae0\u9b5a\u3001\u9c46\u3001\u82f1: octopus\uff09\u306f\u3001\u982d\u8db3\u7db1 \u9798\u5f62\u4e9c\u7db1 \u516b\u8155\u5f62\u4e0a\u76ee\u306e\u516b\u8155\u5f62\u76ee\uff08\u516b\u8155\u76ee\u3001\u5b66\u540d\uff1aOctopoda\uff09\u306b\u5206\u985e\u3055\u308c\u308b\u8edf\u4f53\u52d5\u7269\u306e\u7dcf\u79f0\u3067\u3042\u308b[1][2]\u3002\u89d2\u8cea\u74b0\u3084\u67c4\u306e\u306a\u3044\u5438\u76e4\u3092\u4ed8\u3051\u305f\u3001\u591a\u69d8\u306a\u6a5f\u80fd\u3092\u6301\u3064\u7b4b\u8089\u306b\u5bcc\u3093\u30608\u672c\u306e\u8155\u3068\u3001\u810a\u690e\u52d5\u7269\u306b\u5339\u6575\u3059\u308b\u5927\u304d\u306a\u8133\u3092\u6301\u3064\u982d\u90e8\u3092\u524d\u65b9\u306b\u305d\u306a\u3048\u3001\u539a\u3044\u5916\u5957\u819c\u306b\u8986\u308f\u308c\u305f\u5185\u81d3\u584a\u304b\u3089\u306a\u308b\u80f4\u3092\u5f8c\u65b9\u306b\u6301\u3064\u3053\u3068\u3092\u7279\u5fb4\u3068\u3059\u308b\u3002",
+                        "title": "Octopus \ud83d\udc19",
+                        "uri": "http://localhost:8888/2026/10/15/closed/"
+                    }
+                },
+                "langs": [
+                    "en"
+                ],
+                "text": "Read my delicious article about octopuses \ud83d\udc19"
+            },
+            "embed": {
+                "external": {
+                    "uri": "http://localhost:8888/2026/10/15/closed/",
+                    "title": "Octopus \ud83d\udc19",
+                    "description": "\u30bf\u30b3\uff08\u86f8\u3001\u9bb9\u3001\u7ae0\u9b5a\u3001\u9c46\u3001\u82f1: octopus\uff09\u306f\u3001\u982d\u8db3\u7db1 \u9798\u5f62\u4e9c\u7db1 \u516b\u8155\u5f62\u4e0a\u76ee\u306e\u516b\u8155\u5f62\u76ee\uff08\u516b\u8155\u76ee\u3001\u5b66\u540d\uff1aOctopoda\uff09\u306b\u5206\u985e\u3055\u308c\u308b\u8edf\u4f53\u52d5\u7269\u306e\u7dcf\u79f0\u3067\u3042\u308b[1][2]\u3002\u89d2\u8cea\u74b0\u3084\u67c4\u306e\u306a\u3044\u5438\u76e4\u3092\u4ed8\u3051\u305f\u3001\u591a\u69d8\u306a\u6a5f\u80fd\u3092\u6301\u3064\u7b4b\u8089\u306b\u5bcc\u3093\u30608\u672c\u306e\u8155\u3068\u3001\u810a\u690e\u52d5\u7269\u306b\u5339\u6575\u3059\u308b\u5927\u304d\u306a\u8133\u3092\u6301\u3064\u982d\u90e8\u3092\u524d\u65b9\u306b\u305d\u306a\u3048\u3001\u539a\u3044\u5916\u5957\u819c\u306b\u8986\u308f\u308c\u305f\u5185\u81d3\u584a\u304b\u3089\u306a\u308b\u80f4\u3092\u5f8c\u65b9\u306b\u6301\u3064\u3053\u3068\u3092\u7279\u5fb4\u3068\u3059\u308b\u3002"
+                },
+                "$type": "app.bsky.embed.external#view"
+            },
+            "bookmarkCount": 0,
+            "replyCount": 0,
+            "repostCount": 0,
+            "likeCount": 0,
+            "quoteCount": 0,
+            "indexedAt": "2026-10-17T21:30:40.657Z",
+            "labels": []
+        }
+    ]
+}

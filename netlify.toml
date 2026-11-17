@@ -1,0 +1,17 @@
+# Configuración de Netlify: build del sitio estático con Vite.
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Content-Security-Policy (decisión 2 del diseño de caderno-mvp). Va como cabecera
+# y no como <meta> para no romper el HMR de `npm run dev` y para poder usar
+# frame-ancestors. Si cambian `pdsUrl` o `appviewUrl` en src/config.ts, hay que
+# actualizar connect-src. 'unsafe-inline' en style-src cubre el <style> de
+# index.html y el aspect-ratio que se pone en las imágenes.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src https://cdn.bsky.app; connect-src https://eurosky.social https://public.api.bsky.app https://api.blacksky.community; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'"

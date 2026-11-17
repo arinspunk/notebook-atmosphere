@@ -1,0 +1,101 @@
+{
+    "records": [
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.like/3n2hmagwopq2o",
+            "cid": "bafyreicprehprdeoyjlowllha5rxw3udstejeogcynxmosdejwopkjqzlm",
+            "value": {
+                "$type": "app.bsky.feed.like",
+                "subject": {
+                    "cid": "bafyreieem7n323yyyroxfhxrfoqbbmmfp4ff5of7napcnvofpru4wi2vje",
+                    "uri": "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3n2hma6m3ak25"
+                },
+                "createdAt": "2026-11-16T22:46:35.250Z"
+            }
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.like/3n2hm5tma4r2b",
+            "cid": "bafyreihzgsfs4t55atls2b563wnnkncsxsutrz2kujr6vhr5cj7yoydmjq",
+            "value": {
+                "$type": "app.bsky.feed.like",
+                "subject": {
+                    "cid": "bafyreiayud57vrgggvi4pustbtz5xjxslbqv6rzkm3yv6gu2zq5yuulibu",
+                    "uri": "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3n2hm4byxe225"
+                },
+                "createdAt": "2026-11-16T22:45:07.882Z"
+            }
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.like/3n2hm5nqjbz2b",
+            "cid": "bafyreicp4pzmxei5xghsgo4qolwubnhgk4caogyzzmpbhciqbilcs52q5u",
+            "value": {
+                "$type": "app.bsky.feed.like",
+                "subject": {
+                    "cid": "bafyreic46jms2hsshrunw2popaciraksi7tr3xuf5l5kvkvua4n57sn7jy",
+                    "uri": "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3n2hlzjt2l225"
+                },
+                "createdAt": "2026-11-16T22:45:01.732Z"
+            }
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.like/3n2hm5llvdr2e",
+            "cid": "bafyreiei6yo5duymqi6um6zzjay6sl3uabx3hkemjrc6ot3pt3zd7dtfxq",
+            "value": {
+                "$type": "app.bsky.feed.like",
+                "subject": {
+                    "cid": "bafyreihq7gqvffvhr2n3lptlc56ejx23sjj7xm4vjjvnhytro2cvcpmncm",
+                    "uri": "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3n2hlyc7pv225"
+                },
+                "createdAt": "2026-11-16T22:44:59.400Z"
+            }
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.like/3mxz4cyxoju2a",
+            "cid": "bafyreic63i3mdwwue6mirinhctaicosrvhtbxpxbm4faqaimnnlahgety4",
+            "value": {
+                "$type": "app.bsky.feed.like",
+                "subject": {
+                    "cid": "bafyreiglsw4pxypbi3xewepab4lk5szpn62ubrcb7sxvtorzrh6bjb5wei",
+                    "uri": "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3mwszzre4x22w"
+                },
+                "createdAt": "2026-10-16T17:34:01.835Z"
+            }
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.like/3mxz4cwphkz2l",
+            "cid": "bafyreihtks2qmy6mdykh2w7eujjsqlh6qutvkuov7vuplmsirzlyawl5dq",
+            "value": {
+                "$type": "app.bsky.feed.like",
+                "subject": {
+                    "cid": "bafyreicaga7yfrxr5vsyktftwbjrrrgeeuhzhqgko7qddmzwegpc4rvfbq",
+                    "uri": "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3mwtnl5guwc2v"
+                },
+                "createdAt": "2026-10-16T17:33:59.468Z"
+            }
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.like/3mxz4cv65ae2t",
+            "cid": "bafyreiermdoxd26mrgnxeuufyohqbwww67jqg3znzk2kb4kwshe6vrjg3m",
+            "value": {
+                "$type": "app.bsky.feed.like",
+                "subject": {
+                    "cid": "bafyreifxed2gcli72cwwq7zkomprdogvjvoux3d5zqlwryx3bfbmt6y6nu",
+                    "uri": "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3mwtnqmn6c22v"
+                },
+                "createdAt": "2026-10-16T17:33:57.852Z"
+            }
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.like/3mxz4crsf7b2l",
+            "cid": "bafyreiamlfovuwpt6tshcdde7rie4urtl2ddo7f72odfrthh4swaz5xjre",
+            "value": {
+                "$type": "app.bsky.feed.like",
+                "subject": {
+                    "cid": "bafyreido2jk6gbnd36sdcao7wfjtworqk5fyo6q7k2qgyosws4q7rixqz4",
+                    "uri": "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3mxz2mbod5c2e"
+                },
+                "createdAt": "2026-10-16T17:33:54.270Z"
+            }
+        }
+    ],
+    "cursor": "3mxz4crsf7b2l"
+}

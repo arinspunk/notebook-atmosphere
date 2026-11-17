@@ -1,0 +1,460 @@
+{
+    "thread": {
+        "post": {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hlsmfo5k2w",
+            "cid": "bafyreigwx2on3htkvaujbxid4v2skvn4pxuhggwib7y33fyosj5mzvnhhq",
+            "author": {
+                "did": "did:plc:t3q3ylsnsser3o74xz42sdqk",
+                "handle": "usoritual.com",
+                "displayName": "Uso ritual",
+                "associated": {
+                    "activitySubscription": {
+                        "allowSubscriptions": "followers"
+                    }
+                },
+                "labels": []
+            },
+            "record": {
+                "$type": "app.bsky.feed.post",
+                "createdAt": "2026-11-16T22:38:51.298Z",
+                "embed": {
+                    "$type": "app.bsky.embed.images",
+                    "images": [
+                        {
+                            "alt": "umha chispa de auto-colantes desenhados a mao",
+                            "aspectRatio": {
+                                "height": 1380,
+                                "width": 1840
+                            },
+                            "image": {
+                                "$type": "blob",
+                                "ref": {
+                                    "$link": "bafkreidatcvvth2fmbu5u76txh3u26brdy3xpmx7g6l5cmeybeysgzkxlm"
+                                },
+                                "mimeType": "image/jpeg",
+                                "size": 1674741
+                            }
+                        }
+                    ]
+                },
+                "facets": [
+                    {
+                        "features": [
+                            {
+                                "$type": "app.bsky.richtext.facet#tag",
+                                "tag": "caderno"
+                            }
+                        ],
+                        "index": {
+                            "byteEnd": 25,
+                            "byteStart": 17
+                        }
+                    },
+                    {
+                        "features": [
+                            {
+                                "$type": "app.bsky.richtext.facet#tag",
+                                "tag": "naia"
+                            }
+                        ],
+                        "index": {
+                            "byteEnd": 31,
+                            "byteStart": 26
+                        }
+                    }
+                ],
+                "langs": [
+                    "gl",
+                    "pt"
+                ],
+                "text": "Prova de desenho #caderno #naia"
+            },
+            "embed": {
+                "images": [
+                    {
+                        "thumb": "https://cdn.bsky.app/img/feed_thumbnail/plain/did:plc:t3q3ylsnsser3o74xz42sdqk/bafkreidatcvvth2fmbu5u76txh3u26brdy3xpmx7g6l5cmeybeysgzkxlm",
+                        "fullsize": "https://cdn.bsky.app/img/feed_fullsize/plain/did:plc:t3q3ylsnsser3o74xz42sdqk/bafkreidatcvvth2fmbu5u76txh3u26brdy3xpmx7g6l5cmeybeysgzkxlm",
+                        "alt": "umha chispa de auto-colantes desenhados a mao",
+                        "aspectRatio": {
+                            "height": 1380,
+                            "width": 1840
+                        }
+                    }
+                ],
+                "$type": "app.bsky.embed.images#view"
+            },
+            "bookmarkCount": 0,
+            "replyCount": 3,
+            "repostCount": 0,
+            "likeCount": 0,
+            "quoteCount": 0,
+            "indexedAt": "2026-11-16T22:38:51.298Z",
+            "labels": [],
+            "threadgate": {
+                "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.threadgate/3n2hlsmfo5k2w",
+                "cid": "bafyreifbqatbvsg62rk2hmhlmv2bdvfltuwy7pdki4ezoyqyj534fnnhf4",
+                "record": {
+                    "$type": "app.bsky.feed.threadgate",
+                    "createdAt": "2026-11-16T22:46:43.868Z",
+                    "hiddenReplies": [
+                        "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3n2hma6m3ak25"
+                    ],
+                    "post": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hlsmfo5k2w"
+                },
+                "lists": []
+            }
+        },
+        "replies": [
+            {
+                "post": {
+                    "uri": "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3n2hma6m3ak25",
+                    "cid": "bafyreieem7n323yyyroxfhxrfoqbbmmfp4ff5of7napcnvofpru4wi2vje",
+                    "author": {
+                        "did": "did:plc:myufvpeutlocqv3tpnzsvwoe",
+                        "handle": "xulioze.eurosky.social",
+                        "associated": {
+                            "activitySubscription": {
+                                "allowSubscriptions": "followers"
+                            }
+                        },
+                        "labels": []
+                    },
+                    "record": {
+                        "$type": "app.bsky.feed.post",
+                        "createdAt": "2026-11-16T22:46:26.594Z",
+                        "langs": [
+                            "es"
+                        ],
+                        "reply": {
+                            "parent": {
+                                "cid": "bafyreigwx2on3htkvaujbxid4v2skvn4pxuhggwib7y33fyosj5mzvnhhq",
+                                "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hlsmfo5k2w"
+                            },
+                            "root": {
+                                "cid": "bafyreigwx2on3htkvaujbxid4v2skvn4pxuhggwib7y33fyosj5mzvnhhq",
+                                "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hlsmfo5k2w"
+                            }
+                        },
+                        "text": "ocultada"
+                    },
+                    "bookmarkCount": 0,
+                    "replyCount": 0,
+                    "repostCount": 0,
+                    "likeCount": 1,
+                    "quoteCount": 0,
+                    "indexedAt": "2026-11-16T22:46:26.594Z",
+                    "labels": []
+                },
+                "replies": [],
+                "threadContext": {
+                    "rootAuthorLike": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.like/3n2hmagwopq2o"
+                },
+                "$type": "app.bsky.feed.defs#threadViewPost"
+            },
+            {
+                "post": {
+                    "uri": "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3n2hm6i2xik25",
+                    "cid": "bafyreifoewykyikid7tyipc6y4dakeinveve4rubzjxal7e76cjfjewvlm",
+                    "author": {
+                        "did": "did:plc:myufvpeutlocqv3tpnzsvwoe",
+                        "handle": "xulioze.eurosky.social",
+                        "associated": {
+                            "activitySubscription": {
+                                "allowSubscriptions": "followers"
+                            }
+                        },
+                        "labels": []
+                    },
+                    "record": {
+                        "$type": "app.bsky.feed.post",
+                        "createdAt": "2026-11-16T22:45:29.411Z",
+                        "langs": [
+                            "es"
+                        ],
+                        "reply": {
+                            "parent": {
+                                "cid": "bafyreigwx2on3htkvaujbxid4v2skvn4pxuhggwib7y33fyosj5mzvnhhq",
+                                "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hlsmfo5k2w"
+                            },
+                            "root": {
+                                "cid": "bafyreigwx2on3htkvaujbxid4v2skvn4pxuhggwib7y33fyosj5mzvnhhq",
+                                "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hlsmfo5k2w"
+                            }
+                        },
+                        "text": "\ud83d\ude0d"
+                    },
+                    "bookmarkCount": 0,
+                    "replyCount": 1,
+                    "repostCount": 0,
+                    "likeCount": 0,
+                    "quoteCount": 0,
+                    "indexedAt": "2026-11-16T22:45:29.411Z",
+                    "labels": []
+                },
+                "replies": [
+                    {
+                        "post": {
+                            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hm7ey7vc2r",
+                            "cid": "bafyreianurwqeuifyysmofdflcor6rwpiupfnsaxzcqhxxbq47mpajdcxm",
+                            "author": {
+                                "did": "did:plc:t3q3ylsnsser3o74xz42sdqk",
+                                "handle": "usoritual.com",
+                                "displayName": "Uso ritual",
+                                "associated": {
+                                    "activitySubscription": {
+                                        "allowSubscriptions": "followers"
+                                    }
+                                },
+                                "labels": []
+                            },
+                            "record": {
+                                "$type": "app.bsky.feed.post",
+                                "createdAt": "2026-11-16T22:45:59.729Z",
+                                "langs": [
+                                    "es"
+                                ],
+                                "reply": {
+                                    "parent": {
+                                        "cid": "bafyreifoewykyikid7tyipc6y4dakeinveve4rubzjxal7e76cjfjewvlm",
+                                        "uri": "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3n2hm6i2xik25"
+                                    },
+                                    "root": {
+                                        "cid": "bafyreigwx2on3htkvaujbxid4v2skvn4pxuhggwib7y33fyosj5mzvnhhq",
+                                        "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hlsmfo5k2w"
+                                    }
+                                },
+                                "text": "cumu?"
+                            },
+                            "bookmarkCount": 0,
+                            "replyCount": 0,
+                            "repostCount": 0,
+                            "likeCount": 0,
+                            "quoteCount": 0,
+                            "indexedAt": "2026-11-16T22:45:59.729Z",
+                            "labels": []
+                        },
+                        "replies": [],
+                        "threadContext": {},
+                        "$type": "app.bsky.feed.defs#threadViewPost"
+                    }
+                ],
+                "threadContext": {},
+                "$type": "app.bsky.feed.defs#threadViewPost"
+            },
+            {
+                "post": {
+                    "uri": "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3n2hlyc7pv225",
+                    "cid": "bafyreihq7gqvffvhr2n3lptlc56ejx23sjj7xm4vjjvnhytro2cvcpmncm",
+                    "author": {
+                        "did": "did:plc:myufvpeutlocqv3tpnzsvwoe",
+                        "handle": "xulioze.eurosky.social",
+                        "associated": {
+                            "activitySubscription": {
+                                "allowSubscriptions": "followers"
+                            }
+                        },
+                        "labels": []
+                    },
+                    "record": {
+                        "$type": "app.bsky.feed.post",
+                        "createdAt": "2026-11-16T22:42:01.948Z",
+                        "langs": [
+                            "es"
+                        ],
+                        "reply": {
+                            "parent": {
+                                "cid": "bafyreigwx2on3htkvaujbxid4v2skvn4pxuhggwib7y33fyosj5mzvnhhq",
+                                "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hlsmfo5k2w"
+                            },
+                            "root": {
+                                "cid": "bafyreigwx2on3htkvaujbxid4v2skvn4pxuhggwib7y33fyosj5mzvnhhq",
+                                "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hlsmfo5k2w"
+                            }
+                        },
+                        "text": "chulo!"
+                    },
+                    "bookmarkCount": 0,
+                    "replyCount": 1,
+                    "repostCount": 0,
+                    "likeCount": 1,
+                    "quoteCount": 0,
+                    "indexedAt": "2026-11-16T22:42:01.948Z",
+                    "labels": []
+                },
+                "replies": [
+                    {
+                        "post": {
+                            "uri": "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3n2hlzjt2l225",
+                            "cid": "bafyreic46jms2hsshrunw2popaciraksi7tr3xuf5l5kvkvua4n57sn7jy",
+                            "author": {
+                                "did": "did:plc:myufvpeutlocqv3tpnzsvwoe",
+                                "handle": "xulioze.eurosky.social",
+                                "associated": {
+                                    "activitySubscription": {
+                                        "allowSubscriptions": "followers"
+                                    }
+                                },
+                                "labels": []
+                            },
+                            "record": {
+                                "$type": "app.bsky.feed.post",
+                                "createdAt": "2026-11-16T22:42:43.477Z",
+                                "langs": [
+                                    "es"
+                                ],
+                                "reply": {
+                                    "parent": {
+                                        "cid": "bafyreihq7gqvffvhr2n3lptlc56ejx23sjj7xm4vjjvnhytro2cvcpmncm",
+                                        "uri": "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3n2hlyc7pv225"
+                                    },
+                                    "root": {
+                                        "cid": "bafyreigwx2on3htkvaujbxid4v2skvn4pxuhggwib7y33fyosj5mzvnhhq",
+                                        "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hlsmfo5k2w"
+                                    }
+                                },
+                                "text": "\u2620\ufe0f"
+                            },
+                            "bookmarkCount": 0,
+                            "replyCount": 1,
+                            "repostCount": 0,
+                            "likeCount": 1,
+                            "quoteCount": 0,
+                            "indexedAt": "2026-11-16T22:42:43.477Z",
+                            "labels": []
+                        },
+                        "replies": [
+                            {
+                                "post": {
+                                    "uri": "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3n2hm4byxe225",
+                                    "cid": "bafyreiayud57vrgggvi4pustbtz5xjxslbqv6rzkm3yv6gu2zq5yuulibu",
+                                    "author": {
+                                        "did": "did:plc:myufvpeutlocqv3tpnzsvwoe",
+                                        "handle": "xulioze.eurosky.social",
+                                        "associated": {
+                                            "activitySubscription": {
+                                                "allowSubscriptions": "followers"
+                                            }
+                                        },
+                                        "labels": []
+                                    },
+                                    "record": {
+                                        "$type": "app.bsky.feed.post",
+                                        "createdAt": "2026-11-16T22:44:15.945Z",
+                                        "langs": [
+                                            "es"
+                                        ],
+                                        "reply": {
+                                            "parent": {
+                                                "cid": "bafyreic46jms2hsshrunw2popaciraksi7tr3xuf5l5kvkvua4n57sn7jy",
+                                                "uri": "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3n2hlzjt2l225"
+                                            },
+                                            "root": {
+                                                "cid": "bafyreigwx2on3htkvaujbxid4v2skvn4pxuhggwib7y33fyosj5mzvnhhq",
+                                                "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hlsmfo5k2w"
+                                            }
+                                        },
+                                        "text": "\ud83d\udc7a"
+                                    },
+                                    "bookmarkCount": 0,
+                                    "replyCount": 1,
+                                    "repostCount": 0,
+                                    "likeCount": 1,
+                                    "quoteCount": 0,
+                                    "indexedAt": "2026-11-16T22:44:15.945Z",
+                                    "labels": []
+                                },
+                                "replies": [
+                                    {
+                                        "post": {
+                                            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hm4uuazc2l",
+                                            "cid": "bafyreiass5wlcxcnt5khsq33t64bi6v2jiync4xnriluld4rmq22vg2tzm",
+                                            "author": {
+                                                "did": "did:plc:t3q3ylsnsser3o74xz42sdqk",
+                                                "handle": "usoritual.com",
+                                                "displayName": "Uso ritual",
+                                                "associated": {
+                                                    "activitySubscription": {
+                                                        "allowSubscriptions": "followers"
+                                                    }
+                                                },
+                                                "labels": []
+                                            },
+                                            "record": {
+                                                "$type": "app.bsky.feed.post",
+                                                "createdAt": "2026-11-16T22:44:35.713Z",
+                                                "facets": [
+                                                    {
+                                                        "features": [
+                                                            {
+                                                                "$type": "app.bsky.richtext.facet#tag",
+                                                                "tag": "naia"
+                                                            }
+                                                        ],
+                                                        "index": {
+                                                            "byteEnd": 15,
+                                                            "byteStart": 10
+                                                        }
+                                                    }
+                                                ],
+                                                "langs": [
+                                                    "es"
+                                                ],
+                                                "reply": {
+                                                    "parent": {
+                                                        "cid": "bafyreiayud57vrgggvi4pustbtz5xjxslbqv6rzkm3yv6gu2zq5yuulibu",
+                                                        "uri": "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3n2hm4byxe225"
+                                                    },
+                                                    "root": {
+                                                        "cid": "bafyreigwx2on3htkvaujbxid4v2skvn4pxuhggwib7y33fyosj5mzvnhhq",
+                                                        "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hlsmfo5k2w"
+                                                    }
+                                                },
+                                                "text": "obrigada! #naia"
+                                            },
+                                            "bookmarkCount": 0,
+                                            "replyCount": 0,
+                                            "repostCount": 0,
+                                            "likeCount": 0,
+                                            "quoteCount": 0,
+                                            "indexedAt": "2026-11-16T22:44:35.713Z",
+                                            "labels": []
+                                        },
+                                        "threadContext": {},
+                                        "$type": "app.bsky.feed.defs#threadViewPost"
+                                    }
+                                ],
+                                "threadContext": {
+                                    "rootAuthorLike": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.like/3n2hm5tma4r2b"
+                                },
+                                "$type": "app.bsky.feed.defs#threadViewPost"
+                            }
+                        ],
+                        "threadContext": {
+                            "rootAuthorLike": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.like/3n2hm5nqjbz2b"
+                        },
+                        "$type": "app.bsky.feed.defs#threadViewPost"
+                    }
+                ],
+                "threadContext": {
+                    "rootAuthorLike": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.like/3n2hm5llvdr2e"
+                },
+                "$type": "app.bsky.feed.defs#threadViewPost"
+            }
+        ],
+        "threadContext": {},
+        "$type": "app.bsky.feed.defs#threadViewPost"
+    },
+    "threadgate": {
+        "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.threadgate/3n2hlsmfo5k2w",
+        "cid": "bafyreifbqatbvsg62rk2hmhlmv2bdvfltuwy7pdki4ezoyqyj534fnnhf4",
+        "record": {
+            "$type": "app.bsky.feed.threadgate",
+            "createdAt": "2026-11-16T22:46:43.868Z",
+            "hiddenReplies": [
+                "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3n2hma6m3ak25"
+            ],
+            "post": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hlsmfo5k2w"
+        },
+        "lists": []
+    }
+}

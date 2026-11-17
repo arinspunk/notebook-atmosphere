@@ -1,0 +1,394 @@
+{
+    "records": [
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hm7ey7vc2r",
+            "cid": "bafyreianurwqeuifyysmofdflcor6rwpiupfnsaxzcqhxxbq47mpajdcxm",
+            "value": {
+                "text": "cumu?",
+                "$type": "app.bsky.feed.post",
+                "langs": [
+                    "es"
+                ],
+                "reply": {
+                    "root": {
+                        "cid": "bafyreigwx2on3htkvaujbxid4v2skvn4pxuhggwib7y33fyosj5mzvnhhq",
+                        "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hlsmfo5k2w"
+                    },
+                    "parent": {
+                        "cid": "bafyreifoewykyikid7tyipc6y4dakeinveve4rubzjxal7e76cjfjewvlm",
+                        "uri": "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3n2hm6i2xik25"
+                    }
+                },
+                "createdAt": "2026-11-16T22:45:59.729Z"
+            }
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hm4uuazc2l",
+            "cid": "bafyreiass5wlcxcnt5khsq33t64bi6v2jiync4xnriluld4rmq22vg2tzm",
+            "value": {
+                "text": "obrigada! #naia",
+                "$type": "app.bsky.feed.post",
+                "langs": [
+                    "es"
+                ],
+                "reply": {
+                    "root": {
+                        "cid": "bafyreigwx2on3htkvaujbxid4v2skvn4pxuhggwib7y33fyosj5mzvnhhq",
+                        "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hlsmfo5k2w"
+                    },
+                    "parent": {
+                        "cid": "bafyreiayud57vrgggvi4pustbtz5xjxslbqv6rzkm3yv6gu2zq5yuulibu",
+                        "uri": "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3n2hm4byxe225"
+                    }
+                },
+                "facets": [
+                    {
+                        "index": {
+                            "byteEnd": 15,
+                            "byteStart": 10
+                        },
+                        "features": [
+                            {
+                                "tag": "naia",
+                                "$type": "app.bsky.richtext.facet#tag"
+                            }
+                        ]
+                    }
+                ],
+                "createdAt": "2026-11-16T22:44:35.713Z"
+            }
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hlw4u4k22y",
+            "cid": "bafyreifixnw2h3vo6qhc6kmu3dpdcdfmtxfuhs2pfmjxrslxulhu3ysyvy",
+            "value": {
+                "text": "Outro debuxo #caderno #leon",
+                "$type": "app.bsky.feed.post",
+                "embed": {
+                    "$type": "app.bsky.embed.images",
+                    "images": [
+                        {
+                            "alt": "arte",
+                            "image": {
+                                "ref": {
+                                    "$link": "bafkreib2nupr7rfjyzctyvqcisy4d752dsvkgh5dym2hhpupb2tyqb4aqm"
+                                },
+                                "size": 1570743,
+                                "$type": "blob",
+                                "mimeType": "image/jpeg"
+                            },
+                            "aspectRatio": {
+                                "width": 1840,
+                                "height": 1320
+                            }
+                        },
+                        {
+                            "alt": "lambetadas",
+                            "image": {
+                                "ref": {
+                                    "$link": "bafkreidatcvvth2fmbu5u76txh3u26brdy3xpmx7g6l5cmeybeysgzkxlm"
+                                },
+                                "size": 1674741,
+                                "$type": "blob",
+                                "mimeType": "image/jpeg"
+                            },
+                            "aspectRatio": {
+                                "width": 1840,
+                                "height": 1380
+                            }
+                        }
+                    ]
+                },
+                "langs": [
+                    "gl",
+                    "pt"
+                ],
+                "facets": [
+                    {
+                        "index": {
+                            "byteEnd": 21,
+                            "byteStart": 13
+                        },
+                        "features": [
+                            {
+                                "tag": "caderno",
+                                "$type": "app.bsky.richtext.facet#tag"
+                            }
+                        ]
+                    },
+                    {
+                        "index": {
+                            "byteEnd": 27,
+                            "byteStart": 22
+                        },
+                        "features": [
+                            {
+                                "tag": "leon",
+                                "$type": "app.bsky.richtext.facet#tag"
+                            }
+                        ]
+                    }
+                ],
+                "createdAt": "2026-11-16T22:40:49.212Z"
+            }
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3n2hlsmfo5k2w",
+            "cid": "bafyreigwx2on3htkvaujbxid4v2skvn4pxuhggwib7y33fyosj5mzvnhhq",
+            "value": {
+                "text": "Prova de desenho #caderno #naia",
+                "$type": "app.bsky.feed.post",
+                "embed": {
+                    "$type": "app.bsky.embed.images",
+                    "images": [
+                        {
+                            "alt": "umha chispa de auto-colantes desenhados a mao",
+                            "image": {
+                                "ref": {
+                                    "$link": "bafkreidatcvvth2fmbu5u76txh3u26brdy3xpmx7g6l5cmeybeysgzkxlm"
+                                },
+                                "size": 1674741,
+                                "$type": "blob",
+                                "mimeType": "image/jpeg"
+                            },
+                            "aspectRatio": {
+                                "width": 1840,
+                                "height": 1380
+                            }
+                        }
+                    ]
+                },
+                "langs": [
+                    "gl",
+                    "pt"
+                ],
+                "facets": [
+                    {
+                        "index": {
+                            "byteEnd": 25,
+                            "byteStart": 17
+                        },
+                        "features": [
+                            {
+                                "tag": "caderno",
+                                "$type": "app.bsky.richtext.facet#tag"
+                            }
+                        ]
+                    },
+                    {
+                        "index": {
+                            "byteEnd": 31,
+                            "byteStart": 26
+                        },
+                        "features": [
+                            {
+                                "tag": "naia",
+                                "$type": "app.bsky.richtext.facet#tag"
+                            }
+                        ]
+                    }
+                ],
+                "createdAt": "2026-11-16T22:38:51.298Z"
+            }
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3my3zz36oe42v",
+            "cid": "bafyreihffa3xt7sz3noi4rxbfmubeme7h4otv5w6ruexcfoyn5i7n3xsua",
+            "value": {
+                "text": "Read my delicious article about octopuses \ud83d\udc19",
+                "$type": "app.bsky.feed.post",
+                "embed": {
+                    "$type": "app.bsky.embed.external",
+                    "external": {
+                        "uri": "http://localhost:8888/2026/10/15/closed/",
+                        "title": "Octopus \ud83d\udc19",
+                        "description": "\u30bf\u30b3\uff08\u86f8\u3001\u9bb9\u3001\u7ae0\u9b5a\u3001\u9c46\u3001\u82f1: octopus\uff09\u306f\u3001\u982d\u8db3\u7db1 \u9798\u5f62\u4e9c\u7db1 \u516b\u8155\u5f62\u4e0a\u76ee\u306e\u516b\u8155\u5f62\u76ee\uff08\u516b\u8155\u76ee\u3001\u5b66\u540d\uff1aOctopoda\uff09\u306b\u5206\u985e\u3055\u308c\u308b\u8edf\u4f53\u52d5\u7269\u306e\u7dcf\u79f0\u3067\u3042\u308b[1][2]\u3002\u89d2\u8cea\u74b0\u3084\u67c4\u306e\u306a\u3044\u5438\u76e4\u3092\u4ed8\u3051\u305f\u3001\u591a\u69d8\u306a\u6a5f\u80fd\u3092\u6301\u3064\u7b4b\u8089\u306b\u5bcc\u3093\u30608\u672c\u306e\u8155\u3068\u3001\u810a\u690e\u52d5\u7269\u306b\u5339\u6575\u3059\u308b\u5927\u304d\u306a\u8133\u3092\u6301\u3064\u982d\u90e8\u3092\u524d\u65b9\u306b\u305d\u306a\u3048\u3001\u539a\u3044\u5916\u5957\u819c\u306b\u8986\u308f\u308c\u305f\u5185\u81d3\u584a\u304b\u3089\u306a\u308b\u80f4\u3092\u5f8c\u65b9\u306b\u6301\u3064\u3053\u3068\u3092\u7279\u5fb4\u3068\u3059\u308b\u3002"
+                    }
+                },
+                "langs": [
+                    "en"
+                ],
+                "createdAt": "2026-10-17T21:30:40.221Z"
+            }
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3mxz34ajkhs25",
+            "cid": "bafyreihwqo6sjikypxgdt7qas3bggqe7zq3crk4kcri6vkcogotk7wzpfa",
+            "value": {
+                "text": "outros a fazer esterco\u2026",
+                "$type": "app.bsky.feed.post",
+                "langs": [
+                    "es"
+                ],
+                "reply": {
+                    "root": {
+                        "cid": "bafyreibbvuyb6dkru2q6xr2qju3odc4k72rumezcjawpscxvebljisf3gi",
+                        "uri": "at://did:plc:ab37lrigzcu5sjlhrpchlgbh/app.bsky.feed.post/3mxz2wxcy6l2a"
+                    },
+                    "parent": {
+                        "cid": "bafyreibbvuyb6dkru2q6xr2qju3odc4k72rumezcjawpscxvebljisf3gi",
+                        "uri": "at://did:plc:ab37lrigzcu5sjlhrpchlgbh/app.bsky.feed.post/3mxz2wxcy6l2a"
+                    }
+                },
+                "createdAt": "2026-10-16T17:12:21.188Z"
+            }
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3mxz2gu4qgn23",
+            "cid": "bafyreie3dstxls7ib5xacvbnwf3nstljydjkuhpqsaagyhqvbkfaxs4an4",
+            "value": {
+                "text": "Publish to Eurosky!",
+                "$type": "app.bsky.feed.post",
+                "embed": {
+                    "$type": "app.bsky.embed.external",
+                    "external": {
+                        "uri": "http://localhost:8888/2026/10/15/hello-world/",
+                        "thumb": {
+                            "ref": {
+                                "$link": "bafkreiamkhrhv2eejd4l7rqvkoiuivz6yhscxzwy753wieckuzdrmse6ly"
+                            },
+                            "size": 360533,
+                            "$type": "blob",
+                            "mimeType": "image/png"
+                        },
+                        "title": "Hello world",
+                        "description": "Welcome to atproto comments!"
+                    }
+                },
+                "langs": [
+                    "en"
+                ],
+                "createdAt": "2026-10-16T17:00:23.392Z"
+            }
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3mxufezpvds2f",
+            "cid": "bafyreif266stdghnma7o6mpy5oydzvuglwgfmxx6kyh67bkljmzrca3ude",
+            "value": {
+                "text": "\u2014Onde estiveches, meu filli\u00f1o?\n\u2014En Inglaterra, mi\u00f1a mai. \n\u2014Debaixo da terra? Ai! E que com\u00edas?\n\u2014Caldo con unto.\n\u2014\u00d3sos de defunto? Ai! E onde durm\u00edas?\n\u2014Nunha cama dura. \n\u2014Ai, meu probe, nunha sepultura!",
+                "$type": "app.bsky.feed.post",
+                "langs": [
+                    "es"
+                ],
+                "reply": {
+                    "root": {
+                        "cid": "bafyreidhlcrzl2i72zhenu3hkjf77aks2umwsuxelhnwovtqnqkm24m6oi",
+                        "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3mwso7oovnp2u"
+                    },
+                    "parent": {
+                        "cid": "bafyreic3rkjdsgms3snqiuf4p3vl32y6a4ca7gtnj32b5babzprrs53wf4",
+                        "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3mxufa2kwqc2m"
+                    }
+                },
+                "createdAt": "2026-10-14T20:32:54.771Z"
+            }
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3mxufa2kwqc2m",
+            "cid": "bafyreic3rkjdsgms3snqiuf4p3vl32y6a4ca7gtnj32b5babzprrs53wf4",
+            "value": {
+                "text": "O limite som seis? o posterior fica enterrado no cemit\u00e9rio?",
+                "$type": "app.bsky.feed.post",
+                "langs": [
+                    "es"
+                ],
+                "reply": {
+                    "root": {
+                        "cid": "bafyreidhlcrzl2i72zhenu3hkjf77aks2umwsuxelhnwovtqnqkm24m6oi",
+                        "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3mwso7oovnp2u"
+                    },
+                    "parent": {
+                        "cid": "bafyreibymh44473lj3ubbq73v3kjpn4qcv27lo73ed37dwpu34bjpzdzki",
+                        "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3mxuf5ysuns2m"
+                    }
+                },
+                "createdAt": "2026-10-14T20:30:07.886Z"
+            }
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3mxuf5ysuns2m",
+            "cid": "bafyreibymh44473lj3ubbq73v3kjpn4qcv27lo73ed37dwpu34bjpzdzki",
+            "value": {
+                "text": "que acontece se continuamos a deixar respostas?",
+                "$type": "app.bsky.feed.post",
+                "langs": [
+                    "es"
+                ],
+                "reply": {
+                    "root": {
+                        "cid": "bafyreidhlcrzl2i72zhenu3hkjf77aks2umwsuxelhnwovtqnqkm24m6oi",
+                        "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3mwso7oovnp2u"
+                    },
+                    "parent": {
+                        "cid": "bafyreicaga7yfrxr5vsyktftwbjrrrgeeuhzhqgko7qddmzwegpc4rvfbq",
+                        "uri": "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3mwtnl5guwc2v"
+                    }
+                },
+                "createdAt": "2026-10-14T20:28:58.939Z"
+            }
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3mwt2bhuves22",
+            "cid": "bafyreihh7havkddtnnhmk4aw3yzwgntcm4pm6wd7gdptd4epgio5ekvxee",
+            "value": {
+                "text": "certo coma a morte, por\u00e9m os sonhos e os p\u00e1ssaros tenhem outra opiniom",
+                "$type": "app.bsky.feed.post",
+                "langs": [
+                    "gl"
+                ],
+                "reply": {
+                    "root": {
+                        "cid": "bafyreidhlcrzl2i72zhenu3hkjf77aks2umwsuxelhnwovtqnqkm24m6oi",
+                        "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3mwso7oovnp2u"
+                    },
+                    "parent": {
+                        "cid": "bafyreiglsw4pxypbi3xewepab4lk5szpn62ubrcb7sxvtorzrh6bjb5wei",
+                        "uri": "at://did:plc:myufvpeutlocqv3tpnzsvwoe/app.bsky.feed.post/3mwszzre4x22w"
+                    }
+                },
+                "createdAt": "2026-10-01T14:16:12.871Z"
+            }
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3mwso7oovnp2u",
+            "cid": "bafyreidhlcrzl2i72zhenu3hkjf77aks2umwsuxelhnwovtqnqkm24m6oi",
+            "value": {
+                "text": "Bem-vinda ao Uso Ritual, estamos a trabalhar no desenvolvimento do site",
+                "$type": "app.bsky.feed.post",
+                "embed": {
+                    "$type": "app.bsky.embed.external",
+                    "external": {
+                        "uri": "https://usoritual.com/bem-vinda/",
+                        "title": "Bem-vinda ao Uso Ritual, estamos a trabalhar no desenvolvimento do site",
+                        "description": "De momento o conte\u00fado \u00e9 fict\u00edcio \ud83e\udd13"
+                    }
+                },
+                "langs": [
+                    "pt"
+                ],
+                "createdAt": "2026-10-01T14:07:10.033Z"
+            }
+        },
+        {
+            "uri": "at://did:plc:t3q3ylsnsser3o74xz42sdqk/app.bsky.feed.post/3mwrsllwad35q",
+            "cid": "bafyreigbkiowrlxycjw3grwl24b3ev6g7tlv6gsllex22cfoqlr5maalxe",
+            "value": {
+                "text": "Welcome to Uso Ritual \u2014 we're working on the site",
+                "$type": "app.bsky.feed.post",
+                "embed": {
+                    "$type": "app.bsky.embed.external",
+                    "external": {
+                        "uri": "https://usoritual.com/en/welcome/",
+                        "title": "Welcome to Uso Ritual \u2014 we're working on the site",
+                        "description": "For now the content is fictional \ud83e\udd13"
+                    }
+                },
+                "langs": [
+                    "en"
+                ],
+                "createdAt": "2026-10-01T14:07:10.529Z"
+            }
+        }
+    ],
+    "cursor": "3mwrsllwad35q"
+}
