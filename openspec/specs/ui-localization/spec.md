@@ -11,7 +11,7 @@ Todos los textos fijos de la interfaz (contadores, nombre genérico, navegación
 
 #### Scenario: Idioma por defecto
 - **WHEN** la configuración no indica idioma
-- **THEN** la interfaz se muestra en galego, con "Fiz feliz a N amigas" y "o caderno"
+- **THEN** la interfaz se muestra en galego, con "Fiz feliz a N amigas 🥰" y "o caderno"
 
 #### Scenario: Cadena sobrescrita
 - **WHEN** la configuración sobrescribe el nombre genérico con "a casa"
@@ -26,7 +26,7 @@ Los textos con número SHALL elegir su forma (singular, plural u otras) según l
 
 #### Scenario: Singular y plural en galego
 - **WHEN** el contador de likes vale 1 y después 2
-- **THEN** se muestra "Fiz feliz a 1 amiga" y "Fiz feliz a 2 amigas"
+- **THEN** se muestra "Fiz feliz a 1 amiga 🥰" y "Fiz feliz a 2 amigas 🥰"
 
 ### Requirement: Fecha relativa
 Las fechas SHALL mostrarse como "agora" por debajo de 60 segundos, y después en minutos, horas, días (menos de 30) y meses (de 30 días, menos de 365), con las unidades y el patrón del idioma (en `gl`, "há {t}"). "agora" y la fecha corta NO SHALL llevar el patrón. A partir de 365 días SHALL mostrarse la fecha corta en el formato del idioma.
