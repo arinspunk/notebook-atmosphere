@@ -5,7 +5,10 @@ Sitio estático (TypeScript + Vite, sin framework ni backend) que muestra los di
 ## Cómo se trabaja
 
 - Los cambios de comportamiento pasan por OpenSpec (`openspec/changes/`, skills `openspec-*`). Para revisar un change antes de implementarlo, usa la skill `revisar-change`.
-- Idiomas: artefactos de OpenSpec, comentarios y README en **castellano**; textos de la interfaz en **galego**, con la misma norma que `src/lib/i18n.ts` ("há", "desenho", "não"); identificadores y clases CSS en **inglés**.
+- Idiomas:
+  - En **inglés**: comentarios del código, artefactos de OpenSpec (proposal, design, specs, tasks), nombres de los changes, **mensajes de commit**, README y cualquier otra documentación, además de identificadores y clases CSS. Los ficheros nuevos van enteros en inglés. En los que ya existen en castellano, lo que se añada va en inglés, y la traducción del resto queda para un change propio.
+  - En **galego**: los textos de la interfaz, con la misma norma que `src/lib/i18n.ts` ("há", "desenho", "não").
+  - La conversación con el autor sigue en su idioma.
 - Comprobar antes de dar algo por hecho: `npm run check` y `npm test`. Para lo que afecte al navegador o a la CSP: `npm run build && npm run preview` y la consola sin violaciones.
 
 ## Reglas que no se rompen

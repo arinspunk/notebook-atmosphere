@@ -22,7 +22,7 @@ Las suposiciones del design ("hoy X hace Y", "en 3 sitios", "jsdom serializa…"
 - **Frescura de la moderación:** si hay cachés nuevas, ¿cuál es la edad máxima de lo que se muestra? ¿Está escrita en una spec con escenarios? ¿La edad se cuenta desde la pieza más antigua?
 - **Contenido ajeno y CSP:** nada de `innerHTML` ni de estilos en línea en el HTML; cualquier origen o recurso nuevo (fuente, imagen, CDN, `data:`) tiene su directiva en `netlify.toml`.
 - **Estilos:** clases BEM en inglés, tokens semánticos y ningún color literal.
-- **Idiomas:** artefactos en castellano e interfaz en galego.
+- **Idiomas:** artefactos, comentarios y documentación en inglés; interfaz en galego.
 - **Pureza:** la lógica de decisión sigue en funciones puras con tests, separada del DOM y de la red.
 
 ## 4. Coherencia entre artefactos
@@ -38,7 +38,7 @@ Preguntarse si el change es más complejo de lo que exige su "Why". Si una parte
 
 ## 6. Informe
 
-En castellano, conciso, sin repetir lo que ya está bien salvo una o dos frases de valoración:
+En el idioma de la conversación, conciso, sin repetir lo que ya está bien salvo una o dos frases de valoración:
 
 - **Importantes:** lo que rompe una garantía o haría fallar la implementación, con el fichero y la línea o sección.
 - **Incoherencias:** contradicciones entre artefactos.

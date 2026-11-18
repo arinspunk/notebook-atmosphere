@@ -1,9 +1,9 @@
 schema: spec-driven
 
 context: |
-  Escribe todos los artefactos en castellano; los textos de la interfaz, en galego.
-  El público son niños: ante cualquier duda o error en los datos de moderación, una respuesta no se muestra (fallar cerrado).
-  Solo cliente: sin servidor propio ni autenticación.
+  Write all artifacts and change names in English; UI texts stay in Galician (same norm as src/lib/i18n.ts).
+  The audience is children: on any doubt or error in moderation data, a reply is not shown (fail closed).
+  Client only: no server of our own and no authentication.
 
 # Project context (optional)
 # Add only constraints that should guide OpenSpec artifacts and workflows.
