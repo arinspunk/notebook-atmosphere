@@ -94,6 +94,18 @@ Un test comprueba que todas las clases siguen la convención.
 - Se enlazan con rutas relativas desde el CSS (`url("../assets/fonts/x.woff2")`) o con `import` desde TypeScript; Vite les añade un hash.
 - **Nada de URIs `data:`:** la CSP las bloquea. Vite está configurado para no generarlas (`assetsInlineLimit: 0`), pero tampoco hay que escribirlas a mano (`url("data:image/svg+xml,…")`): el SVG va como fichero.
 
+**La fuente, "Caderno Letra":** es [Andika](https://software.sil.org/andika/) 6.200 (SIL, licencia OFL, ver `src/assets/fonts/OFL.txt`), recortada a los alfabetos latinos y convertida a WOFF2 (unos 70 KB por cara en vez de ~750 KB). Lleva otro nombre porque la licencia reserva "Andika" para la versión original. Para regenerarla:
+
+```sh
+pip install fonttools brotli
+# Andika-Regular.ttf, Andika-Italic.ttf y Andika-Bold.ttf en tooling/fonts-src/
+python3 tooling/fonts.py tooling/fonts-src
+```
+
+Los TTF no se versionan (`*.ttf` en `.gitignore`) ni se publican. Si cambias el recorte en `tooling/fonts.py`, cambia también `unicode-range` en `fonts.css`.
+
+**La hoja de cuaderno:** `.post` es una caja blanca normal que crece con el contenido; sombra y bordes los pone CSS. Las anillas son `src/assets/images/notebook-rings.png`, una tira de **un periodo** de la hoja de Figma (capa `folha`), exportada a 2x y ajustada a 60 px de alto para que se repita cada 30 px, el mismo interlineado del texto. Sus agujeros son transparentes y el fondo blanco empieza donde acaba la tira, así que por ellos se ve el fondo de la página. No se usa la hoja entera (`docs/design/notebook-page.png`) porque al repetirla se cortan las anillas y se repite la sombra.
+
 **Recursos externos:** la CSP de [`netlify.toml`](netlify.toml) solo admite lo propio del sitio. Para usar una fuente de Google Fonts o un CDN, añade su origen a la directiva que corresponda: `font-src` para fuentes, `style-src` para hojas, `img-src` para imágenes. Si no, el navegador lo bloquea en producción. `npm run dev` no aplica la CSP; `npm run build && npm run preview` sí, y así se ve el bloqueo en la consola antes de publicar.
 
 ## Probar

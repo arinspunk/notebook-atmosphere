@@ -22,7 +22,7 @@ Sitio estático (TypeScript + Vite, sin framework ni backend) que muestra los di
 
 - CSS a secas en `src/styles/`, ordenado con `@layer` (tokens, base, layout, components, utilities); un fichero por componente.
 - Clases BEM en inglés (`post`, `pager`, `replies`, `reply`, `post-list`, `post-card`, `byline`, `status`). Nunca las antiguas en galego.
-- Los componentes solo usan tokens semánticos de `theme.css`: ningún color literal (hex, `rgb()`, nombres de color…).
+- Los componentes solo usan tokens semánticos de `theme.css`: ningún color literal (hex, `rgb()`, nombres de color…). Texto y foco con contraste suficiente: `--color-accent` es solo decorativo (un test lo comprueba).
 - Fuentes e imágenes propias en `src/assets/`, nunca como URI `data:`.
 
 ## Particularidades conocidas
@@ -30,6 +30,8 @@ Sitio estático (TypeScript + Vite, sin framework ni backend) que muestra los di
 - El PDS de Eurosky responde **400 `RecordNotFound`** (no 404) cuando un record no existe, y devuelve `cursor` también en la última página de `listRecords`.
 - Blacksky corta `getPostThread` a unos 5 niveles: el nodo cortado llega **sin** la clave `replies` y hay que pedir la continuación (`resolveContinuations`).
 - El fichero de tokens se llama `src/styles/theme.css` y no `tokens.css` porque el entorno de los agentes bloquea los ficheros con "token" en el nombre. No lo renombres.
+- En Vitest, `import "x.css?raw"` devuelve una cadena **vacía**: los tests que leen hojas usan `tests/files.ts` (lee del disco) y comprueban que no están vacías.
+- La fuente se llama "Caderno Letra" y no "Andika": la licencia OFL reserva ese nombre para la versión sin modificar. Se regenera con `tooling/fonts.py` (ver README).
 - `src/config.ts` apunta a la cuenta de pruebas (`usoritual.com`) hasta que exista la definitiva.
 - `node_modules` está instalado para macOS. Desde un Linux (VM o contenedor), los tests fallan por el binario nativo de rollup: ejecútalos en una copia sin `node_modules` con `npm ci`, sin tocar el `node_modules` del proyecto.
 - El repositorio local no tiene `user.name`/`user.email`; usa el autor de los commits anteriores. El push lo hace el autor desde su terminal (el agente no tiene credenciales de GitHub).

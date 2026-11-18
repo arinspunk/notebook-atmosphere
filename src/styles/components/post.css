@@ -1,20 +1,64 @@
-/* Bloque `post`: la página de un dibujo. */
+/*
+ * Bloque `post`: la página de un dibujo, como una hoja de cuaderno de espiral
+ * (componente `Post` de Figma).
+ *
+ * La hoja es una caja normal que crece con el contenido. Las anillas son una
+ * tira de un periodo (notebook-rings.png, a 2x) que se repite en vertical cada
+ * `--line`; sus agujeros son transparentes. Por eso el fondo blanco empieza
+ * donde acaba la tira: debajo de ella solo pinta la tira, y por los agujeros
+ * se ve el fondo de la página.
+ */
 
+.post {
+  max-width: var(--sheet-width);
+  margin-inline: auto;
+  padding: var(--sheet-padding);
+  padding-inline-start: calc(var(--sheet-padding) + var(--sheet-rings));
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sheet);
+  background:
+    url("../../assets/images/notebook-rings.png") left 0 top 0.625rem / var(--sheet-rings-tile-width) var(--line) repeat-y,
+    linear-gradient(
+      to right,
+      transparent var(--sheet-rings-tile-width),
+      var(--color-surface) var(--sheet-rings-tile-width)
+    );
+  transform: rotate(-1deg);
+}
+
+/* Imagen: siempre en un cuadrado, recortada si no lo es (se suben cuadradas). */
 .post__media {
-  margin: 0;
+  margin: 0 0 var(--sheet-padding);
+  aspect-ratio: 1;
 }
 
 .post__image {
   display: block;
   width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
+/* Texto del dibujo, como escrito a mano. */
 .post__text {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: var(--font-size-lg);
+  line-height: var(--line);
   white-space: pre-line;
   overflow-wrap: anywhere; /* una URL larga no desborda en móvil */
 }
 
-.post__byline,
+/* Autoría y contadores, a la derecha. */
+.post__byline {
+  justify-content: flex-end;
+  margin: var(--space-4) 0 0;
+  text-align: end;
+}
+
 .post__stat {
-  margin-block: var(--space-2);
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  text-align: end;
 }

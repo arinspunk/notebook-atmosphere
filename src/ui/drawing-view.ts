@@ -3,14 +3,14 @@
  * navegación y tarjetas de respuestas.
  *
  * Se pinta en dos partes: lo del catálogo (texto, nombre, fecha, flechas y el
- * hueco de la imagen con la proporción del record) al momento, y lo de la red
+ * hueco cuadrado de la imagen, si el record la trae) al momento, y lo de la red
  * (imagen, contadores y tarjetas, o el mensaje de error) cuando llega.
  */
 
 import type { Card } from "../cards.ts";
 import { attributeName, type Drawing, type Neighbours } from "../catalog.ts";
 import type { Config } from "../config.ts";
-import { firstImage, recordAspectRatio } from "../embed.ts";
+import { firstImage, recordHasImage } from "../embed.ts";
 import type { I18n } from "../lib/i18n.ts";
 import { cleanCadernoSegments, facetSegments } from "../lib/text.ts";
 import type { PostView } from "../lib/types.ts";
@@ -41,14 +41,11 @@ function renderImage(post: PostView): HTMLImageElement | null {
   const attrs: Record<string, string> = { class: "post__image", src, alt: typeof img.alt === "string" ? img.alt : "" };
   const ar = img.aspectRatio;
   if (ar && ar.width > 0 && ar.height > 0) {
-    // Reserva la proporción antes de que cargue.
+    // Tamaño intrínseco para el navegador; el hueco cuadrado lo da post.css.
     attrs.width = String(ar.width);
     attrs.height = String(ar.height);
   }
-  const node = el("img", attrs);
-  // Por CSSOM y no con el atributo `style`: la CSP no permite estilos en línea.
-  if (ar && ar.width > 0 && ar.height > 0) node.style.aspectRatio = `${ar.width} / ${ar.height}`;
-  return node;
+  return el("img", attrs);
 }
 
 function renderNav(n: Neighbours, i18n: I18n): HTMLElement {
@@ -116,13 +113,8 @@ export interface DrawingShell {
 /** Parte del catálogo, al momento; la de la red se rellena con `fill` o `fail`. */
 export function renderDrawingShell({ drawing, neighbours, config, i18n, now }: DrawingShellInput): DrawingShell {
   const segments = cleanCadernoSegments(drawing.record);
-  const ar = recordAspectRatio(drawing.record);
-  // Hueco de la imagen con la proporción del record; sin ella, no se reserva nada.
-  let figure: HTMLElement | null = null;
-  if (ar) {
-    figure = el("figure", { class: "post__media" });
-    figure.style.aspectRatio = `${ar.width} / ${ar.height}`; // CSSOM: ver renderImage
-  }
+  // Hueco cuadrado de la imagen (post.css) si el record trae imagen; si no, nada.
+  let figure: HTMLElement | null = recordHasImage(drawing.record) ? el("figure", { class: "post__media" }) : null;
   const nav = renderNav(neighbours, i18n);
   const element = el(
     "article",
@@ -131,7 +123,7 @@ export function renderDrawingShell({ drawing, neighbours, config, i18n, now }: D
     segments.length ? el("p", { class: "post__text" }, renderSegments(segments)) : null,
     el(
       "p",
-      { class: "post__byline byline" },
+      { class: "post__byline byline byline--large" },
       el("strong", { class: "byline__name" }, drawing.nombre ?? i18n.t("genericName")),
       " ",
       renderTime(drawing.record.createdAt, i18n, now, "byline__date"),

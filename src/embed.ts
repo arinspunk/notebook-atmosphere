@@ -1,5 +1,5 @@
 /**
- * Primera imagen de un post del AppView y su proporción en el record del PDS.
+ * Primera imagen de un post del AppView y si el record del PDS trae imagen.
  * Funciones puras.
  */
 
@@ -24,18 +24,14 @@ const IMAGES_RECORD = "app.bsky.embed.images";
 const RECORD_WITH_MEDIA_RECORD = "app.bsky.embed.recordWithMedia";
 
 /**
- * `aspectRatio` de la primera imagen del record del PDS (de `embed.images` o,
- * en `recordWithMedia`, de `media.images`); `null` si no hay o no es válido.
+ * Si el record del PDS trae al menos una imagen (en `embed.images` o, en
+ * `recordWithMedia`, en `media.images`). Basta para reservar el hueco cuadrado
+ * de la imagen antes de tener la URL del AppView.
  */
-export function recordAspectRatio(record: PostRecord | undefined): { width: number; height: number } | null {
+export function recordHasImage(record: PostRecord | undefined): boolean {
   const embed = record?.embed as { $type?: unknown; images?: unknown; media?: { $type?: unknown; images?: unknown } } | undefined;
   let images: unknown;
   if (embed?.$type === IMAGES_RECORD) images = embed.images;
   else if (embed?.$type === RECORD_WITH_MEDIA_RECORD && embed.media?.$type === IMAGES_RECORD) images = embed.media.images;
-  if (!Array.isArray(images)) return null;
-  const ar = (images[0] as { aspectRatio?: { width?: unknown; height?: unknown } } | undefined)?.aspectRatio;
-  const { width, height } = ar ?? {};
-  if (typeof width !== "number" || typeof height !== "number" || !(width > 0) || !(height > 0)) return null;
-  if (!Number.isFinite(width) || !Number.isFinite(height)) return null;
-  return { width, height };
+  return Array.isArray(images) && images.length > 0 && typeof images[0] === "object" && images[0] !== null;
 }

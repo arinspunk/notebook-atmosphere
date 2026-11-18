@@ -5,9 +5,9 @@ describe("i18n", () => {
   test("gl por defecto, con plural de likes", () => {
     const i = createI18n(undefined);
     expect(i.lang).toBe("gl");
-    expect(i.tn("likes", 1)).toBe("Fiz feliz a 1 amiga");
-    expect(i.tn("likes", 2)).toBe("Fiz feliz a 2 amigas");
-    expect(i.tn("likes", 20)).toBe("Fiz feliz a 20 amigas");
+    expect(i.tn("likes", 1)).toBe("Fiz feliz a 1 amiga 🥰");
+    expect(i.tn("likes", 2)).toBe("Fiz feliz a 2 amigas 🥰");
+    expect(i.tn("likes", 20)).toBe("Fiz feliz a 20 amigas 🥰");
     expect(i.t("genericName")).toBe("o caderno");
   });
 
@@ -26,7 +26,7 @@ describe("i18n", () => {
   test("idioma desconocido cae a gl", () => {
     const i = createI18n("xx");
     expect(i.lang).toBe("gl");
-    expect(i.tn("likes", 2)).toBe("Fiz feliz a 2 amigas");
+    expect(i.tn("likes", 2)).toBe("Fiz feliz a 2 amigas 🥰");
   });
 
   test("descarta claves desconocidas y tipos incorrectos", () => {

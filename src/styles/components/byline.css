@@ -7,7 +7,23 @@
   gap: var(--space-2);
 }
 
+.byline__name {
+  font-weight: 700;
+}
+
 .byline__date {
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
+}
+
+/* Autoría del dibujo: más grande y con la fecha sin atenuar. */
+.byline--large {
+  gap: 0.3em;
+  font-size: var(--font-size-lg);
+  line-height: var(--line);
+}
+
+.byline--large .byline__date {
+  color: var(--color-text);
+  font-size: inherit;
 }

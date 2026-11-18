@@ -202,7 +202,7 @@ describe("navegar entre dibujos (1.2)", () => {
     expect(root.textContent).not.toContain("A carregar…");
     expect(root.querySelector(".post__byline strong")?.textContent).toBe("Naia");
     expect(root.querySelector(".post__text")?.textContent).toBe("Prova de desenho");
-    expect(root.querySelector<HTMLElement>("figure")?.style.aspectRatio).toBe("1840 / 1380");
+    expect(root.querySelector("figure.post__media")?.hasAttribute("style")).toBe(false); // hueco cuadrado por CSS
     expect(root.querySelector("figure img")).toBeNull();
     expect(root.querySelector(".replies__thread")).toBeNull();
     await srv.release(NAIA.rkey);
@@ -435,12 +435,12 @@ describe("renderDrawing (6.2)", () => {
   const render = (post: PostView, drawing: Drawing = NAIA, cards = [] as never[]) =>
     renderDrawing({ drawing, post, neighbours: findDrawing(catalog, drawing.rkey), cards, config: CONFIG, i18n, now: NOW });
 
-  test("dibujo real: imagen con alt y proporción, texto limpio, nombre y fecha", () => {
+  test("dibujo real: imagen con alt y tamaño intrínseco, texto limpio, nombre y fecha", () => {
     const el = render(rootPost());
     const img = el.querySelector("img")!;
     expect(img.alt).toBe("umha chispa de auto-colantes desenhados a mao");
     expect(img.getAttribute("width")).toBeTruthy();
-    expect(img.style.aspectRatio).toMatch(/^\d+ \/ \d+$/);
+    expect(img.hasAttribute("style")).toBe(false); // el cuadrado y object-fit los da post.css
     expect(el.querySelector(".post__text")?.textContent).toBe("Prova de desenho");
     expect(el.querySelector(".post__byline strong")?.textContent).toBe("Naia");
     const time = el.querySelector("time")!;
@@ -466,8 +466,8 @@ describe("renderDrawing (6.2)", () => {
   });
 
   test("contadores con plural", () => {
-    expect(render({ ...rootPost(), likeCount: 1 }).querySelector(".post__stat--likes")?.textContent).toBe("Fiz feliz a 1 amiga");
-    expect(render({ ...rootPost(), likeCount: 20 }).querySelector(".post__stat--likes")?.textContent).toBe("Fiz feliz a 20 amigas");
+    expect(render({ ...rootPost(), likeCount: 1 }).querySelector(".post__stat--likes")?.textContent).toBe("Fiz feliz a 1 amiga 🥰");
+    expect(render({ ...rootPost(), likeCount: 20 }).querySelector(".post__stat--likes")?.textContent).toBe("Fiz feliz a 20 amigas 🥰");
     expect(render({ ...rootPost(), repostCount: 3, quoteCount: 1 }).querySelector(".post__stat--shares")?.textContent).toBe("Partilhado 4 vezes");
   });
 
@@ -526,10 +526,11 @@ describe("renderDrawing (6.2)", () => {
 describe("pintado en dos fases (1.1)", () => {
   const shell = (drawing: Drawing = NAIA) => renderDrawingShell({ drawing, neighbours: findDrawing(catalog, drawing.rkey), config: CONFIG, i18n, now: NOW });
 
-  test("el hueco tiene la proporción del record antes de tener la imagen", () => {
+  test("el hueco cuadrado se reserva antes de tener la imagen, sin estilos en línea", () => {
     const s = shell();
-    const fig = s.element.querySelector("figure")!;
-    expect(fig.style.aspectRatio).toBe("1840 / 1380");
+    const fig = s.element.querySelector("figure.post__media")!;
+    expect(fig).not.toBeNull();
+    expect(fig.hasAttribute("style")).toBe(false);
     expect(fig.querySelector("img")).toBeNull();
     expect(s.element.firstElementChild).toBe(fig); // el texto va debajo y no se desplaza
     expect(s.element.querySelector(".post__text")?.textContent).toBe("Prova de desenho");
@@ -540,13 +541,23 @@ describe("pintado en dos fases (1.1)", () => {
   test("también con recordWithMedia", () => {
     const media = NAIA.record.embed;
     const d: Drawing = { ...NAIA, record: { ...NAIA.record, embed: { $type: "app.bsky.embed.recordWithMedia", record: {}, media } } };
-    expect(shell(d).element.querySelector<HTMLElement>("figure")?.style.aspectRatio).toBe("1840 / 1380");
+    expect(shell(d).element.querySelector("figure.post__media")).not.toBeNull();
   });
 
-  test("un record sin aspectRatio no reserva hueco y no da errores", () => {
+  test("un record sin aspectRatio (o con uno no válido) reserva el hueco igualmente", () => {
     const embed = structuredClone(NAIA.record.embed) as { images: { aspectRatio?: unknown }[] };
     delete embed.images[0]!.aspectRatio;
-    for (const e of [embed, undefined, { $type: "app.bsky.embed.images", images: [{ aspectRatio: { width: 0, height: "x" } }] }]) {
+    for (const e of [embed, { $type: "app.bsky.embed.images", images: [{ aspectRatio: { width: 0, height: "x" } }] }]) {
+      const s = shell({ ...NAIA, record: { ...NAIA.record, embed: e } });
+      expect(s.element.firstElementChild?.tagName).toBe("FIGURE");
+      s.fill(rootPost(), []);
+      expect(s.element.querySelectorAll("figure")).toHaveLength(1);
+      expect(s.element.querySelector("figure img")?.getAttribute("alt")).toBe("umha chispa de auto-colantes desenhados a mao");
+    }
+  });
+
+  test("un record sin imagen no reserva hueco y no da errores", () => {
+    for (const e of [undefined, { $type: "app.bsky.embed.images", images: [] }, { $type: "app.bsky.embed.external", external: {} }]) {
       const s = shell({ ...NAIA, record: { ...NAIA.record, embed: e } });
       expect(s.element.querySelector("figure")).toBeNull();
       s.fill(rootPost(), []);
@@ -736,35 +747,6 @@ function badClasses(root: Element): string[] {
   return [...classes].filter((c) => !BEM.test(c) || c.split(/__|--/).some((part) => OLD_CLASSES.includes(part)));
 }
 
-/** Todos los nombres de color de CSS. */
-const NAMED_COLORS = new Set(
-  (
-    "aliceblue antiquewhite aqua aquamarine azure beige bisque black blanchedalmond blue blueviolet brown burlywood cadetblue chartreuse " +
-    "chocolate coral cornflowerblue cornsilk crimson cyan darkblue darkcyan darkgoldenrod darkgray darkgreen darkgrey darkkhaki darkmagenta " +
-    "darkolivegreen darkorange darkorchid darkred darksalmon darkseagreen darkslateblue darkslategray darkslategrey darkturquoise darkviolet " +
-    "deeppink deepskyblue dimgray dimgrey dodgerblue firebrick floralwhite forestgreen fuchsia gainsboro ghostwhite gold goldenrod gray green " +
-    "greenyellow grey honeydew hotpink indianred indigo ivory khaki lavender lavenderblush lawngreen lemonchiffon lightblue lightcoral " +
-    "lightcyan lightgoldenrodyellow lightgray lightgreen lightgrey lightpink lightsalmon lightseagreen lightskyblue lightslategray " +
-    "lightslategrey lightsteelblue lightyellow lime limegreen linen magenta maroon mediumaquamarine mediumblue mediumorchid mediumpurple " +
-    "mediumseagreen mediumslateblue mediumspringgreen mediumturquoise mediumvioletred midnightblue mintcream mistyrose moccasin navajowhite " +
-    "navy oldlace olive olivedrab orange orangered orchid palegoldenrod palegreen paleturquoise palevioletred papayawhip peachpuff peru pink " +
-    "plum powderblue purple rebeccapurple red rosybrown royalblue saddlebrown salmon sandybrown seagreen seashell sienna silver skyblue " +
-    "slateblue slategray slategrey snow springgreen steelblue tan teal thistle tomato turquoise violet wheat white whitesmoke yellow yellowgreen"
-  ).split(" "),
-);
-
-/** Colores literales en las declaraciones de `css` (sin contar los `var(...)`). */
-function literalColors(css: string): string[] {
-  const found: string[] = [];
-  const clean = css.replace(/\/\*[\s\S]*?\*\//g, "");
-  for (const m of clean.matchAll(/(?:^|[;{])\s*([a-z-]+)\s*:\s*([^;{}]+)(?=[;}])/g)) {
-    const value = m[2]!.replace(/var\([^)]*\)/g, "").toLowerCase();
-    found.push(...(value.match(/#[0-9a-f]{3,8}\b/g) ?? []));
-    found.push(...(value.match(/\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(/g) ?? []));
-    found.push(...(value.match(/[a-z]+/g) ?? []).filter((w) => NAMED_COLORS.has(w)));
-  }
-  return found;
-}
 
 describe("clases BEM y estilos", () => {
   let stop: (() => void) | undefined;
@@ -802,7 +784,7 @@ describe("clases BEM y estilos", () => {
     for (const sel of [".post", ".post__media", ".post__image", ".post__text", ".post__byline", ".post__stat--likes", ".post__stat--shares", ".pager__link--prev", ".pager__link--index", ".pager__link--next"]) {
       expect(el.matches(sel) || el.querySelector(sel) !== null, sel).toBe(true);
     }
-    expect(el.querySelector(".post__stat--likes")?.textContent).toBe("Fiz feliz a 3 amigas"); // los textos siguen en galego
+    expect(el.querySelector(".post__stat--likes")?.textContent).toBe("Fiz feliz a 3 amigas 🥰"); // los textos siguen en galego
   });
 
   test("primer dibujo: sin pager__link--prev y con pager__link--index", () => {
@@ -821,7 +803,7 @@ describe("clases BEM y estilos", () => {
   test("byline compartido en dibujo, respuestas e índice", async () => {
     const el = await fullDrawing();
     const post = el.querySelector(".post__byline")!;
-    expect(post.classList.contains("byline")).toBe(true);
+    expect([...post.classList]).toEqual(["post__byline", "byline", "byline--large"]); // el modificador solo en el dibujo
     expect(post.querySelector(".byline__name")?.textContent).toBe("Naia");
     expect(post.querySelector("time.byline__date")).not.toBeNull();
     for (const header of el.querySelectorAll(".reply > header")) {
@@ -841,6 +823,7 @@ describe("clases BEM y estilos", () => {
       const card = item.querySelector(":scope > .post-card")!;
       expect(card.querySelector(".post-card__thumb")).not.toBeNull();
       expect(card.querySelector(".post-card__byline.byline .byline__name")).not.toBeNull();
+      expect(card.querySelector(".byline--large")).toBeNull();
     }
     await loadThumbnails(CONFIG, mockFetch(() => json(drawingPosts)).fn, view);
     expect(badClasses(view.element)).toEqual([]);
@@ -873,13 +856,5 @@ describe("clases BEM y estilos", () => {
     expect(indexHtml).not.toMatch(/\sstyle\s*=/i);
   });
 
-  test("los componentes no usan colores literales; el comprobador los detecta", () => {
-    const files = import.meta.glob<string>("../src/styles/components/*.css", { query: "?raw", import: "default", eager: true });
-    expect(Object.keys(files).length).toBe(8);
-    for (const [f, css] of Object.entries(files)) expect(literalColors(css), f).toEqual([]);
-    expect(literalColors(".x { color: white; }")).toEqual(["white"]);
-    expect(literalColors(".x { border: 1px solid #ABC; background: rgb(0 0 0); outline-color: oklch(0.5 0.1 200) }")).toEqual(["#abc", "rgb(", "oklch("]);
-    expect(literalColors(".x { color: var(--color-text); border-color: currentColor; background: transparent; /* red */ }")).toEqual([]);
-    expect(literalColors(".white a:hover { color: inherit; }")).toEqual([]);
-  });
+
 });

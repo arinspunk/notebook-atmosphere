@@ -1,17 +1,37 @@
 /*
- * Fuentes autoalojadas. Los ficheros .woff2 van en `src/assets/fonts/` y se
- * enlazan con rutas relativas a este fichero; Vite les añade un hash. La CSP
- * (`font-src 'self'`) no permite fuentes de otros orígenes ni URIs `data:`.
+ * Fuentes autoalojadas. "Caderno Letra" es Andika 6.200 (SIL, licencia OFL,
+ * ver src/assets/fonts/OFL.txt) recortada a los alfabetos latinos y en WOFF2
+ * con tooling/fonts.py. Lleva otro nombre porque la licencia reserva "Andika"
+ * para la versión original.
  *
- * Patrón:
- *
- * @font-face {
- *   font-family: "Nombre";
- *   src: url("../assets/fonts/nombre-regular.woff2") format("woff2");
- *   font-weight: 400;
- *   font-style: normal;
- *   font-display: swap;
- * }
- *
- * Después, en theme.css: --font-body: "Nombre", system-ui, sans-serif;
+ * La CSP (`font-src 'self'`) no permite fuentes de otros orígenes ni URIs `data:`.
+ * `unicode-range` es el mismo recorte que tooling/fonts.py: los emojis y lo que
+ * quede fuera salen de las fuentes del sistema.
  */
+
+@font-face {
+  font-family: "Caderno Letra";
+  src: url("../assets/fonts/caderno-letra-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-024F, U+1E00-1EFF, U+2000-206F, U+20AC;
+}
+
+@font-face {
+  font-family: "Caderno Letra";
+  src: url("../assets/fonts/caderno-letra-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+  unicode-range: U+0000-024F, U+1E00-1EFF, U+2000-206F, U+20AC;
+}
+
+@font-face {
+  font-family: "Caderno Letra";
+  src: url("../assets/fonts/caderno-letra-bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-024F, U+1E00-1EFF, U+2000-206F, U+20AC;
+}

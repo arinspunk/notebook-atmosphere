@@ -22,7 +22,7 @@ const GL = {
   // Autoría
   genericName: "o caderno",
   // Contadores
-  likes: { one: "Fiz feliz a {n} amiga", other: "Fiz feliz a {n} amigas" } as PluralForms,
+  likes: { one: "Fiz feliz a {n} amiga 🥰", other: "Fiz feliz a {n} amigas 🥰" } as PluralForms,
   shared: { one: "Partilhado {n} vez", other: "Partilhado {n} vezes" } as PluralForms,
   // Navegación
   /** Nombre accesible de la navegación entre desenhos. */
