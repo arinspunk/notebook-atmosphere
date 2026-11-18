@@ -10,7 +10,10 @@
  */
 
 .post {
+  display: flex;
+  flex-direction: column;
   max-width: var(--sheet-width);
+  min-height: var(--sheet-height);
   margin-inline: auto;
   padding: var(--sheet-padding);
   padding-inline-start: calc(var(--sheet-padding) + var(--sheet-rings));
@@ -58,7 +61,7 @@
 
 /* Texto del dibujo, como escrito a mano. */
 .post__text {
-  margin: 0;
+  margin: 0 0 auto;
   color: var(--color-ink);
   font-size: var(--font-size-lg);
   line-height: var(--line);

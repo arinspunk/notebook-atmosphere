@@ -62,7 +62,8 @@
 
   /* Hoja del dibujo */
   --sheet-width: 29.25rem; /* 468 px */
-  --sheet-padding: 1.875rem;
+  --sheet-height: 42.1875rem; /* 675 px */
+  --sheet-padding: 2.1875rem;
   --sheet-rings: 1.875rem; /* 30 px más a la izquierda para las anillas */
   --sheet-rings-tile-width: 2.0625rem; /* 33 px: ancho de notebook-rings.png a 1x */
 }
