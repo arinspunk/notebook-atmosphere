@@ -27,7 +27,7 @@ Opening the viewer SHALL fade it in briefly, with a duration from the design tok
 ## MODIFIED Requirements
 
 ### Requirement: Estilos solo desde hojas del propio sitio
-Styles SHALL load only from stylesheets served by the site itself. The `index.html` generated for publishing SHALL NOT contain `<style>` elements or `style` attributes. Styles the code sets at run time through CSSOM (such as the proportion of the index thumbnails and of the drawing's image slot) do not count as inline styles of the HTML, and the code SHALL NOT set them with `setAttribute("style", …)`. The default square shape of the drawing's image slot SHALL come from the stylesheet; its real proportion MAY come from the code through CSSOM.
+Styles SHALL load only from stylesheets served by the site itself. The published `index.html` SHALL NOT contain `<style>` elements or `style` attributes. Proportions the code sets through CSSOM (index thumbnails, the drawing's image slot) are not inline styles of the HTML; the code SHALL NOT use `setAttribute("style", …)`. The slot's default square SHALL come from the stylesheet.
 
 #### Scenario: HTML publicado
 - **WHEN** the publishable site is generated
