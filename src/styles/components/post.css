@@ -26,17 +26,34 @@
   transform: rotate(-1deg);
 }
 
-/* Imagen: siempre en un cuadrado, recortada si no lo es (se suben cuadradas). */
+/*
+ * Image slot. The square is only the default: the code sets the drawing's
+ * own proportion through CSSOM when the record or the AppView has one.
+ */
 .post__media {
   margin: 0 0 var(--sheet-padding);
   aspect-ratio: 1;
+}
+
+/*
+ * The image is the control that opens the viewer: a button without button
+ * styling that fills the slot. The focus outline comes from base.css.
+ */
+.post__zoom {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
 }
 
 .post__image {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain; /* whole and undistorted, even if the proportions disagree */
 }
 
 /* Texto del dibujo, como escrito a mano. */

@@ -31,6 +31,13 @@ const GL = {
   next: "Seguinte",
   index: "Todos os desenhos",
   home: "Início",
+  // Image viewer
+  /** Accessible name of the drawing's image when it has `alt` text. */
+  viewImageWithAlt: "{alt}. Ver o desenho em grande",
+  /** Accessible name of the drawing's image when its `alt` is empty. */
+  viewImage: "Ver o desenho em grande",
+  /** Close button of the viewer. */
+  close: "Fechar",
   // Estados
   loading: "A carregar…",
   error: "Não foi possível carregar o caderno.",

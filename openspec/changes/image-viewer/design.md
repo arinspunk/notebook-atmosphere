@@ -15,7 +15,7 @@ Current state that shapes the approach:
   | `fullsize` (`feed_fullsize`) | the original (1840 × 1320) | ~315 KB |
 
   The square is at most 350 CSS px: 700 device px at 2x. A square drawing's thumbnail is 1000 × 1000, enough up to ~2.8x.
-- **Square:** `.post__media` is a square from `post.css` and `.post__image` fills it with `object-fit: cover`.
+- **Slot:** until this change, `.post__media` was a square from `post.css` and `.post__image` filled it with `object-fit: cover` (decision 8 changes this). The PDS record, which the page has before the AppView answers, carries `aspectRatio` for the image when the client that posted it sent one.
 - **Routing:** the router listens to `hashchange` only. `history.pushState` with the same URL does not fire `hashchange`, and going back to an entry with the same URL fires `popstate` but not `hashchange`.
 - **Re-renders:** `startApp` replaces the content of `#app` on every route change and when the page comes back after more than 10 minutes hidden.
 - **Tests:** jsdom 26 has `HTMLDialogElement` but does not implement `showModal()` or `close()`.
@@ -30,7 +30,7 @@ Current state that shapes the approach:
 **Non-Goals:**
 
 - Zoom and pan of our own: the full image fits the screen and the browser's pinch-zoom does the rest.
-- Animations when opening or closing.
+- An animation when closing (see decision 7).
 - Moving between drawings inside the viewer.
 
 ## Decisions
@@ -43,7 +43,7 @@ Current state that shapes the approach:
 
 ### 2. The image is the control: a `<button>` without button styling
 
-Inside `figure.post__media`, the image goes inside `button.post__zoom` (`type="button"`). The button has no border, background or padding, fills the square and shows a `zoom-in` cursor. Its accessible name comes from `aria-label`, which replaces the name the `img` would give, so it has to carry the `alt` too:
+Inside `figure.post__media`, the image goes inside `button.post__zoom` (`type="button"`). The button has no border, background or padding, fills the slot and shows a `zoom-in` cursor. Its accessible name comes from `aria-label`, which replaces the name the `img` would give, so it has to carry the `alt` too:
 
 - with a non-empty `alt`: new string `viewImageWithAlt`, "{alt}. Ver o desenho em grande";
 - with an empty `alt`, which is common in the drawings: new string `viewImage`, "Ver o desenho em grande".
@@ -96,11 +96,29 @@ The tests stub `HTMLDialogElement.prototype.showModal` and `close`: they set and
 - `closeViewer()` on re-render, including a re-render caused by a navigation to another drawing, which must not go back;
 - the accessible name with and without `alt`.
 
+### 7. A short transition on opening only
+
+Opening fades the dialog and its backdrop in and grows the image from `scale(0.96)`, over `--viewer-duration` (180 ms, new token in `theme.css`). It is CSS only, with `@starting-style` on `.viewer[open]`, so `viewer.ts` does not change. With `prefers-reduced-motion: reduce` there is no transition.
+
+- *Opening only:* animating the close means waiting for `transitionend` before removing the dialog, with `transition-behavior: allow-discrete` on `overlay` and `display`, and deciding what happens when a re-render or a back action arrives during the animation. That complexity would sit in the history handling, the most delicate part of the viewer. Closing stays instant.
+- *Without `@starting-style`* (Chrome before 117, Safari before 17.5, Firefox before 129), the viewer opens at once, as without this decision.
+
+### 8. The slot keeps the drawing's proportions
+
+The forced square goes away: the image is shown whole, with its own proportions.
+
+- **Reserved space:** `renderDrawingShell` reads `aspectRatio` from the PDS record (new pure helper `recordAspectRatio` in `src/embed.ts`, only positive finite numbers) and sets `figure.style.aspectRatio = "w / h"` through CSSOM, as the index thumbnails already do. The CSP allows CSSOM changes, and nothing uses `setAttribute("style", …)`.
+- **Without `aspectRatio` in the record:** `post.css` keeps `aspect-ratio: 1` on `.post__media` as the default, so a square is reserved. When the AppView answers, if its image has a valid `aspectRatio` and the record had none, the figure takes it.
+- **Image:** `.post__zoom` and `.post__image` still fill the slot, with `object-fit: contain` instead of `cover`: if the record and the AppView disagree, the image is neither cropped nor distorted.
+
+*Alternative:* no reservation without `aspectRatio`. The text would jump on every such drawing, instead of only on the non-square ones.
+
 ## Risks / Trade-offs
 
 - **[Reloading the page while the viewer is open leaves a history entry with the same URL]** → After the reload, one back action does nothing visible. At start-up, the app replaces a leftover `{ viewer: true }` state with `null`. The extra entry stays, which is a rare, harmless case.
 - **[The thumbnail looks soft on screens above ~2.8x]** → Accepted: it is still 1000 px, and the viewer is there for detail.
-- **[The thumbnail of a non-square drawing has a short side of ~720 px]** → Barely enough at 2x with `cover`. Drawings are uploaded square.
+- **[A record without `aspectRatio` for a non-square drawing]** → The square reserved at first changes to the real proportion when the AppView answers, so the text moves once. Rare: the clients we use send `aspectRatio`.
+- **[A very tall drawing makes a long page]** → Accepted; the drawings are uploaded square or close to it.
 - **[`<dialog>` support]** → Supported by every current browser. In a browser without it the image would not open, but nothing else breaks.
 
 ## Migration Plan

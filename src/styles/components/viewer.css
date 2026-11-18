@@ -1,0 +1,97 @@
+/*
+ * Block `viewer`: the full drawing over the page, in a modal `<dialog>`
+ * (change image-viewer, decision 5).
+ */
+
+/* The page underneath does not scroll and keeps its position. */
+html:has(.viewer[open]) {
+  overflow: hidden;
+}
+
+.viewer {
+  /* Reset the browser's own <dialog> styles so the viewer covers the viewport. */
+  box-sizing: border-box;
+  width: 100dvw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  padding: var(--viewer-gap);
+  background: transparent;
+  overscroll-behavior: contain;
+}
+
+/* Only while open: the browser hides a closed dialog. */
+.viewer[open] {
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr); /* one cell with a definite size */
+  place-items: center;
+}
+
+.viewer::backdrop {
+  background: var(--color-backdrop);
+}
+
+/* As large as the screen allows, whole and undistorted. */
+.viewer__image {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border: 1px solid var(--color-border);
+}
+
+/*
+ * Opening transition (decision 7): fade in with a slight zoom. Closing is
+ * instant, because the dialog is removed at once. Browsers without
+ * `@starting-style` simply open it without a transition.
+ */
+.viewer[open],
+.viewer[open]::backdrop {
+  transition: opacity var(--viewer-duration) ease-out;
+}
+
+.viewer[open] .viewer__image {
+  transition: transform var(--viewer-duration) ease-out;
+}
+
+@starting-style {
+  .viewer[open],
+  .viewer[open]::backdrop {
+    opacity: 0;
+  }
+
+  .viewer[open] .viewer__image {
+    transform: scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .viewer[open],
+  .viewer[open]::backdrop,
+  .viewer[open] .viewer__image {
+    transition: none;
+  }
+}
+
+.viewer__close {
+  position: absolute;
+  inset-block-start: var(--space-4);
+  inset-inline-end: var(--space-4);
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--font-size-xl);
+  line-height: 1;
+  cursor: pointer;
+}

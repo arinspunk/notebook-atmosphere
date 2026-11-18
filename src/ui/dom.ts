@@ -5,6 +5,10 @@
 import { formatAbsoluteDate, formatRelativeTime, isValidDate } from "../lib/date.ts";
 import type { I18n } from "../lib/i18n.ts";
 import type { TextSegment } from "../lib/text.ts";
+import { isWebUrl } from "../lib/url.ts";
+
+// Re-exported so existing importers keep working; it lives in a DOM-free module.
+export { isWebUrl };
 
 type Child = Node | string | null | undefined | false;
 
@@ -21,17 +25,6 @@ export function el<K extends keyof HTMLElementTagNameMap>(
     node.append(typeof c === "string" ? document.createTextNode(c) : c);
   }
   return node;
-}
-
-/** Si una URL es `http:` o `https:`. */
-export function isWebUrl(href: string | undefined): href is string {
-  if (!href) return false;
-  try {
-    const u = new URL(href);
-    return u.protocol === "http:" || u.protocol === "https:";
-  } catch {
-    return false;
-  }
 }
 
 /**

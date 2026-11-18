@@ -68,3 +68,33 @@ The viewer SHALL close with its close button, by activating anywhere outside the
 #### Scenario: Escape
 - **WHEN** the viewer is open and the visitor presses Escape
 - **THEN** the viewer closes, and a later back action leaves the drawing as usual instead of doing nothing
+
+## RENAMED Requirements
+
+- FROM: `### Requirement: La imagen ocupa un hueco cuadrado`
+- TO: `### Requirement: The image keeps the drawing's proportions`
+
+## MODIFIED Requirements
+
+### Requirement: The image keeps the drawing's proportions
+The first image SHALL be shown whole, as wide as the content and with its own proportions, without cropping or distortion. Its slot SHALL be reserved from the moment the page is shown, before the image is available, whenever the drawing's record carries an image: with the record's `aspectRatio` when it has a valid one, and as a square otherwise.
+
+#### Scenario: Imagen cuadrada
+- **WHEN** the first image is square
+- **THEN** it is shown whole in a square slot
+
+#### Scenario: Imagen apaisada por error
+- **WHEN** the first image measures 1840 × 1320
+- **THEN** it is shown whole in a slot of 1840 / 1320 proportions, without cropping or distortion
+
+#### Scenario: Hueco reservado antes de tener la imagen
+- **WHEN** a drawing is shown whose record carries an image with `aspectRatio`, and the image has not arrived yet
+- **THEN** its slot already has that proportion, and the text does not move when the image appears
+
+#### Scenario: Record sin aspectRatio
+- **WHEN** the first image of the record has no valid `aspectRatio`
+- **THEN** a square slot is reserved, and it takes the AppView's proportion when the image arrives
+
+#### Scenario: Dibujo sin imagen
+- **WHEN** the drawing's record carries no image
+- **THEN** no slot is reserved and the page is shown without errors

@@ -10,12 +10,13 @@
 import type { Card } from "../cards.ts";
 import { attributeName, type Drawing, type Neighbours } from "../catalog.ts";
 import type { Config } from "../config.ts";
-import { firstImage, recordHasImage } from "../embed.ts";
+import { firstImage, pageImageUrl, recordAspectRatio, recordHasImage, validAspectRatio, viewerImageUrl } from "../embed.ts";
 import type { I18n } from "../lib/i18n.ts";
 import { cleanCadernoSegments, facetSegments } from "../lib/text.ts";
 import type { PostView } from "../lib/types.ts";
 import { drawingHref, INDEX_HREF } from "../router.ts";
-import { el, isWebUrl, renderSegments, renderTime } from "./dom.ts";
+import { el, renderSegments, renderTime } from "./dom.ts";
+import { openViewer } from "./viewer.ts";
 
 export interface DrawingViewInput {
   drawing: Drawing;
@@ -33,19 +34,28 @@ function count(n: unknown): number {
   return typeof n === "number" && Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
 }
 
-/** `<img>` de la primera imagen del post, o `null` si no hay una con URL web. */
-function renderImage(post: PostView): HTMLImageElement | null {
+/**
+ * The first image of the post inside `button.post__zoom`, the control that
+ * opens the viewer (decision 2), or `null` if there is no image with a web URL.
+ */
+function renderImage(post: PostView, i18n: I18n): HTMLButtonElement | null {
   const img = firstImage(post);
-  const src = img?.fullsize ?? img?.thumb;
-  if (!img || !isWebUrl(src)) return null;
-  const attrs: Record<string, string> = { class: "post__image", src, alt: typeof img.alt === "string" ? img.alt : "" };
-  const ar = img.aspectRatio;
-  if (ar && ar.width > 0 && ar.height > 0) {
-    // Tamaño intrínseco para el navegador; el hueco cuadrado lo da post.css.
+  const src = pageImageUrl(img); // the thumbnail is enough for the square (decision 1)
+  if (!img || !src) return null;
+  const alt = typeof img.alt === "string" ? img.alt : "";
+  const attrs: Record<string, string> = { class: "post__image", src, alt };
+  const ar = validAspectRatio(img.aspectRatio);
+  if (ar) {
+    // Intrinsic size for the browser; the slot's proportion is set on the figure.
     attrs.width = String(ar.width);
     attrs.height = String(ar.height);
   }
-  return el("img", attrs);
+  // `aria-label` replaces the name the `img` would give, so it carries the `alt` too.
+  const label = alt.trim() ? i18n.t("viewImageWithAlt", { alt: alt.trim() }) : i18n.t("viewImage");
+  const button = el("button", { class: "post__zoom", type: "button", "aria-label": label }, el("img", attrs));
+  const full = viewerImageUrl(img) ?? src;
+  button.addEventListener("click", () => openViewer({ thumb: src, full, alt, i18n, returnFocus: button }));
+  return button;
 }
 
 function renderNav(n: Neighbours, i18n: I18n): HTMLElement {
@@ -94,6 +104,11 @@ export function renderCards(cards: Card[], config: Config, i18n: I18n, now?: num
   );
 }
 
+/** Proportion of the image slot, through CSSOM (never a `style` attribute). */
+function setRatio(figure: HTMLElement, { width, height }: { width: number; height: number }): void {
+  figure.style.aspectRatio = `${width} / ${height}`;
+}
+
 export interface DrawingShellInput {
   drawing: Drawing;
   neighbours: Neighbours;
@@ -113,8 +128,11 @@ export interface DrawingShell {
 /** Parte del catálogo, al momento; la de la red se rellena con `fill` o `fail`. */
 export function renderDrawingShell({ drawing, neighbours, config, i18n, now }: DrawingShellInput): DrawingShell {
   const segments = cleanCadernoSegments(drawing.record);
-  // Hueco cuadrado de la imagen (post.css) si el record trae imagen; si no, nada.
+  // Image slot if the record carries an image (decision 8): with the record's
+  // proportion, through CSSOM; without one, post.css reserves a square.
   let figure: HTMLElement | null = recordHasImage(drawing.record) ? el("figure", { class: "post__media" }) : null;
+  const recordRatio = recordAspectRatio(drawing.record);
+  if (figure && recordRatio) setRatio(figure, recordRatio);
   const nav = renderNav(neighbours, i18n);
   const element = el(
     "article",
@@ -142,9 +160,12 @@ export function renderDrawingShell({ drawing, neighbours, config, i18n, now }: D
   return {
     element,
     fill(post, cards) {
-      const img = renderImage(post);
+      const img = renderImage(post, i18n);
       if (img && figure) figure.append(img);
       else replaceFigure(img && el("figure", { class: "post__media" }, img));
+      // The record had no proportion: take the AppView's, if it has one.
+      const appviewRatio = validAspectRatio(firstImage(post)?.aspectRatio);
+      if (img && figure && !recordRatio && appviewRatio) setRatio(figure, appviewRatio);
       const likes = count(post.likeCount);
       const shared = count(post.repostCount) + count(post.quoteCount);
       nav.before(

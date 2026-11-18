@@ -95,7 +95,7 @@ describe("contraste de los tokens de color", () => {
 describe("colores en los componentes", () => {
   test("los componentes no usan colores literales; el comprobador los detecta", () => {
     const files = readCssDir("src/styles/components");
-    expect(Object.keys(files).length).toBe(8);
+    expect(Object.keys(files).length).toBe(9);
     for (const [f, css] of Object.entries(files)) {
       expect(css.trim(), f).not.toBe(""); // si la lectura falla, el test no puede pasar en vacío
       expect(literalColors(css), f).toEqual([]);
@@ -105,3 +105,23 @@ describe("colores en los componentes", () => {
     expect(literalColors(".x { color: var(--color-text); border-color: currentColor; background: transparent; /* red */ }")).toEqual([]);
     expect(literalColors(".white a:hover { color: inherit; }")).toEqual([]);
   });});
+
+describe("viewer opening transition (image-viewer 4.2)", () => {
+  const viewerCss = readProjectFile("src/styles/components/viewer.css").replace(/\/\*[\s\S]*?\*\//g, "");
+
+  test("opens with @starting-style, and its transitions use the token", () => {
+    expect(viewerCss.trim()).not.toBe("");
+    expect(viewerCss).toMatch(/@starting-style\s*{/);
+    const transitions = [...viewerCss.matchAll(/transition:\s*([^;]+);/g)].map((m) => m[1]!.trim());
+    const animated = transitions.filter((t) => t !== "none");
+    expect(animated.length).toBeGreaterThan(0);
+    for (const t of animated) expect(t).toContain("var(--viewer-duration)");
+    expect(resolveToken(cssCustomProperties(themeCss), "viewer-duration")).toMatch(/^\d+m?s$/);
+  });
+
+  test("with reduced motion there is no transition", () => {
+    const start = viewerCss.search(/@media\s*\(prefers-reduced-motion:\s*reduce\)/);
+    expect(start).toBeGreaterThan(-1);
+    expect(viewerCss.slice(start)).toMatch(/transition:\s*none/);
+  });
+});

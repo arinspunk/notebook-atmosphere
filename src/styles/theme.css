@@ -16,11 +16,12 @@
   --color-surface: #fff; /* la hoja */
   --color-text: #000;
   --color-text-muted: #555;
-  --color-ink: #000; /* texto del dibujo, como escrito a mano */
+  --color-ink: #000;
   --color-link: var(--color-ink);
   --color-focus: var(--color-ink);
   --color-accent: #84fefc; /* solo decoración: no llega a 4,5:1 sobre los fondos */
-  --color-border: #ffdede;
+  --color-border: rgba(8, 0, 55, .5);
+  --color-backdrop: rgba(8, 0, 55, 0.8); /* dark ink behind the viewer; never for text */
 
   /* Sombras */
   --shadow-sheet: -1px 7px 4px -5px rgb(0 0 0 / 0.3);
@@ -51,14 +52,17 @@
   /* Radios */
   --radius-sm: 2px;
   --radius-md: 4px;
+  --radius-full: 100%;
 
   /* Medidas */
   --measure: 40rem;
   --thumb-size: 6em;
+  --viewer-gap: var(--space-4); /* space around the image in the viewer */
+  --viewer-duration: 180ms; /* opening transition of the viewer */
 
   /* Hoja del dibujo */
   --sheet-width: 29.25rem; /* 468 px */
-  --sheet-padding: clamp(1rem, 9vw, 2.75rem); /* 44 px a partir de ~490 px de ancho */
+  --sheet-padding: 1.875rem;
   --sheet-rings: 1.875rem; /* 30 px más a la izquierda para las anillas */
   --sheet-rings-tile-width: 2.0625rem; /* 33 px: ancho de notebook-rings.png a 1x */
 }

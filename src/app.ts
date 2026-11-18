@@ -14,13 +14,14 @@ import { findDrawing, type Drawing } from "./catalog.ts";
 import { memoCatalog } from "./catalog-loader.ts";
 import type { Config } from "./config.ts";
 import { memoDrawings } from "./drawing-loader.ts";
-import { firstImage } from "./embed.ts";
+import { firstImage, pageImageUrl } from "./embed.ts";
 import { createI18n, type I18n, type SimpleKey } from "./lib/i18n.ts";
 import type { KeyValueStorage } from "./likes.ts";
 import { INDEX_HREF, parseRoute, type Route } from "./router.ts";
-import { el, isWebUrl } from "./ui/dom.ts";
+import { el } from "./ui/dom.ts";
 import { renderDrawingShell } from "./ui/drawing-view.ts";
 import { loadThumbnails, renderIndex } from "./ui/index-view.ts";
+import { closeViewer, isViewerState } from "./ui/viewer.ts";
 import type { FetchFn } from "./xrpc.ts";
 
 export interface AppDeps {
@@ -64,10 +65,16 @@ export function startApp(root: HTMLElement, deps: AppDeps, win: Window = window)
   const preloadImage = deps.preloadImage ?? preloadWithImage;
   let generation = 0;
 
+  // A reload while the viewer was open leaves its history entry as the current
+  // one; without the viewer it means nothing, so it is cleared (image-viewer, Risks).
+  if (isViewerState(win.history?.state)) win.history.replaceState(null, "");
+
   const message = (key: StatusKey, ...extra: Node[]) =>
     el("p", { class: `status status--${STATUS_MODIFIER[key]}`, role: "status" }, i18n.t(key), ...extra);
 
   async function render(): Promise<void> {
+    // Whatever is shown next, an open viewer belongs to the previous page.
+    closeViewer();
     const gen = ++generation;
     const isCurrent = () => gen === generation;
     const show = (node: Node) => {
@@ -108,9 +115,9 @@ export function startApp(root: HTMLElement, deps: AppDeps, win: Window = window)
       if (!d) continue;
       void drawingsMemo.load(d.rkey).then((data) => {
         if (data.state !== "ok") return;
-        const img = firstImage(data.post);
-        const src = img?.fullsize ?? img?.thumb;
-        if (isWebUrl(src)) preloadImage(src);
+        // Same URL the page will show: the thumbnail, never the full image.
+        const src = pageImageUrl(firstImage(data.post));
+        if (src) preloadImage(src);
       });
     }
   }

@@ -20,6 +20,10 @@ import pdsPosts from "./fixtures/pds-posts.json";
 import pdsThreadgate from "./fixtures/pds-threadgate.json";
 import { json, mockFetch } from "./helpers.ts";
 import type { FetchFn } from "../src/xrpc.ts";
+import { closeViewer, isViewerState } from "../src/ui/viewer.ts";
+import { fakeImages, installDialogShim, nextPopState } from "./dialog-shim.ts";
+
+installDialogShim();
 
 const DID = "did:plc:t3q3ylsnsser3o74xz42sdqk";
 const CONFIG: Config = {
@@ -202,7 +206,7 @@ describe("navegar entre dibujos (1.2)", () => {
     expect(root.textContent).not.toContain("A carregar…");
     expect(root.querySelector(".post__byline strong")?.textContent).toBe("Naia");
     expect(root.querySelector(".post__text")?.textContent).toBe("Prova de desenho");
-    expect(root.querySelector("figure.post__media")?.hasAttribute("style")).toBe(false); // hueco cuadrado por CSS
+    expect((root.querySelector("figure.post__media") as HTMLElement).style.aspectRatio).toBe("1840 / 1380"); // the record's proportion (image-viewer 4.3)
     expect(root.querySelector("figure img")).toBeNull();
     expect(root.querySelector(".replies__thread")).toBeNull();
     await srv.release(NAIA.rkey);
@@ -274,6 +278,8 @@ describe("precarga de vecinos (2.2)", () => {
     await vi.waitFor(() => expect(t.preloaded).toHaveLength(2));
     expect([t.threads(LEON), t.threads(VELLO)]).toEqual([1, 1]);
     expect(t.preloaded[0]).toMatch(/^https:\/\/cdn\.bsky\.app\//);
+    // image-viewer 1.1: only thumbnails are prefetched, never the full image.
+    for (const src of t.preloaded) expect(src).toMatch(/\/img\/feed_thumbnail\//);
   });
 
   test("al navegar a un vecino preparado se pinta completo sin peticiones nuevas", async () => {
@@ -449,6 +455,14 @@ describe("renderDrawing (6.2)", () => {
     expect(time.title).toMatch(/\d\d\/\d\d\/\d\d/);
   });
 
+  test("image-viewer 1.1: the page shows thumb; fullsize only when there is no thumb", () => {
+    const post = rootPost();
+    const { thumb, fullsize } = post.embed!.images![0]!;
+    expect(render(post).querySelector("img")?.getAttribute("src")).toBe(thumb);
+    delete post.embed!.images![0]!.thumb;
+    expect(render(post).querySelector("img")?.getAttribute("src")).toBe(fullsize);
+  });
+
   test("un texto con <script> se muestra literal", () => {
     const evil: Drawing = { ...NAIA, record: { ...NAIA.record, text: '<script>alert(1)</script><img src=x onerror=alert(1)> #caderno', facets: [] } };
     const el = render(rootPost(), evil);
@@ -486,6 +500,23 @@ describe("renderDrawing (6.2)", () => {
     p.embed!.images![0]!.alt = "";
     expect(render(p).querySelector("img")?.getAttribute("alt")).toBe("");
     expect(render({ ...rootPost(), embed: undefined }).querySelector("img")).toBeNull();
+  });
+
+  test("image-viewer 2.1: the image is a button with an accessible name", () => {
+    const withAlt = rootPost();
+    withAlt.embed!.images![0]!.alt = "Na praia";
+    const el = render(withAlt);
+    const button = el.querySelector<HTMLButtonElement>(".post__media > .post__zoom")!;
+    expect(button.tagName).toBe("BUTTON");
+    expect(button.getAttribute("type")).toBe("button");
+    expect(button.getAttribute("aria-label")).toBe("Na praia. Ver o desenho em grande");
+    expect(button.querySelector(":scope > .post__image")?.getAttribute("alt")).toBe("Na praia");
+    const noAlt = rootPost();
+    noAlt.embed!.images![0]!.alt = "";
+    const el2 = render(noAlt);
+    expect(el2.querySelector(".post__zoom")?.getAttribute("aria-label")).toBe("Ver o desenho em grande");
+    expect(el2.querySelector(".post__image")?.getAttribute("alt")).toBe("");
+    expect(render({ ...rootPost(), embed: undefined }).querySelector(".post__zoom")).toBeNull();
   });
 
   test("la navegación tiene nombre accesible del diccionario", () => {
@@ -526,16 +557,48 @@ describe("renderDrawing (6.2)", () => {
 describe("pintado en dos fases (1.1)", () => {
   const shell = (drawing: Drawing = NAIA) => renderDrawingShell({ drawing, neighbours: findDrawing(catalog, drawing.rkey), config: CONFIG, i18n, now: NOW });
 
-  test("el hueco cuadrado se reserva antes de tener la imagen, sin estilos en línea", () => {
+  test("image-viewer 4.3: the slot is reserved with the record's proportion before the image", () => {
+    const setAttribute = vi.spyOn(Element.prototype, "setAttribute");
     const s = shell();
-    const fig = s.element.querySelector("figure.post__media")!;
+    const fig = s.element.querySelector<HTMLElement>("figure.post__media")!;
     expect(fig).not.toBeNull();
-    expect(fig.hasAttribute("style")).toBe(false);
+    expect(fig.style.aspectRatio).toBe("1840 / 1380");
+    expect(fig.style.length).toBe(1); // nothing else from the code
+    expect(setAttribute.mock.calls.filter(([name]) => name === "style")).toEqual([]); // only CSSOM
+    setAttribute.mockRestore();
     expect(fig.querySelector("img")).toBeNull();
     expect(s.element.firstElementChild).toBe(fig); // el texto va debajo y no se desplaza
     expect(s.element.querySelector(".post__text")?.textContent).toBe("Prova de desenho");
     expect(s.element.querySelector(".post__byline strong")?.textContent).toBe("Naia");
     expect(s.element.querySelector("nav a[rel=next]")).not.toBeNull();
+  });
+
+  test("image-viewer 4.3: landscape record, invalid values and the AppView's proportion on fill", () => {
+    const withRatio = (aspectRatio: unknown) => {
+      const embed = structuredClone(NAIA.record.embed) as { images: { aspectRatio?: unknown }[] };
+      if (aspectRatio === undefined) delete embed.images[0]!.aspectRatio;
+      else embed.images[0]!.aspectRatio = aspectRatio;
+      return shell({ ...NAIA, record: { ...NAIA.record, embed } });
+    };
+    const ratio = (s: ReturnType<typeof shell>) => s.element.querySelector<HTMLElement>("figure")!.style.aspectRatio;
+
+    expect(ratio(withRatio({ width: 1840, height: 1320 }))).toBe("1840 / 1320");
+    for (const bad of [undefined, { width: 0, height: 10 }, { width: -1, height: 10 }, { width: "1", height: 1 }, { width: Infinity, height: 1 }, null]) {
+      const s = withRatio(bad);
+      expect(ratio(s), JSON.stringify(bad)).toBe(""); // the square default from post.css
+      const post = rootPost();
+      post.embed!.images![0]!.aspectRatio = { width: 800, height: 600 };
+      s.fill(post, []);
+      expect(ratio(s)).toBe("800 / 600"); // the AppView's, when the record had none
+      expect(s.element.querySelectorAll("figure img")).toHaveLength(1);
+    }
+
+    // With the record's proportion, the AppView's does not replace it.
+    const s = withRatio({ width: 1, height: 1 });
+    const post = rootPost();
+    post.embed!.images![0]!.aspectRatio = { width: 800, height: 600 };
+    s.fill(post, []);
+    expect(ratio(s)).toBe("1 / 1");
   });
 
   test("también con recordWithMedia", () => {
@@ -781,7 +844,7 @@ describe("clases BEM y estilos", () => {
 
   test("dibujo completo: bloques post y pager", async () => {
     const el = await fullDrawing();
-    for (const sel of [".post", ".post__media", ".post__image", ".post__text", ".post__byline", ".post__stat--likes", ".post__stat--shares", ".pager__link--prev", ".pager__link--index", ".pager__link--next"]) {
+    for (const sel of [".post", ".post__media", ".post__zoom", ".post__image", ".post__text", ".post__byline", ".post__stat--likes", ".post__stat--shares", ".pager__link--prev", ".pager__link--index", ".pager__link--next"]) {
       expect(el.matches(sel) || el.querySelector(sel) !== null, sel).toBe(true);
     }
     expect(el.querySelector(".post__stat--likes")?.textContent).toBe("Fiz feliz a 3 amigas 🥰"); // los textos siguen en galego
@@ -857,4 +920,113 @@ describe("clases BEM y estilos", () => {
   });
 
 
+});
+
+// ---------------------------------------------------------------------------
+// Image viewer in the app (change image-viewer)
+// ---------------------------------------------------------------------------
+
+describe("image viewer in the app (image-viewer 3.1, 3.2)", () => {
+  const FULL = /\/img\/feed_fullsize\//;
+  let stop: (() => void) | undefined;
+  let root: HTMLElement;
+  let images: ReturnType<typeof fakeImages>;
+  const viewer = () => document.querySelector<HTMLDialogElement>("dialog.viewer");
+  const settle = () => new Promise((r) => setTimeout(r, 10));
+
+  afterEach(async () => {
+    stop?.();
+    stop = undefined;
+    if (viewer()) {
+      const popped = nextPopState();
+      closeViewer();
+      await popped;
+    }
+    root?.remove();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+    if (location.hash) {
+      const popped = nextPopState();
+      location.hash = "";
+      await popped;
+    }
+  });
+
+  /** App on `win`, with the root in the document so the focus can return to it. */
+  async function start(win?: Window) {
+    images = fakeImages();
+    vi.stubGlobal("Image", images.FakeImage);
+    const preloaded: string[] = [];
+    const clock = { t: NOW };
+    root = document.createElement("main");
+    document.body.append(root);
+    const app = startApp(root, { config: CONFIG, fetchFn: server().fn, storage: null, now: () => clock.t, preloadImage: (src) => preloaded.push(src) }, win);
+    stop = app.stop;
+    await app.render();
+    await vi.waitFor(() => expect(root.querySelector(".post__zoom")).not.toBeNull());
+    return { app, preloaded, clock };
+  }
+
+  test("no fullsize before opening; the click on .post__zoom opens the viewer with the thumbnail", async () => {
+    const w = fakeWindow(`#/d/${NAIA.rkey}`);
+    const { preloaded } = await start(w.win);
+    await vi.waitFor(() => expect(preloaded.length).toBeGreaterThan(0));
+    await settle();
+    const srcs = [...document.querySelectorAll("img")].map((i) => i.getAttribute("src") ?? "");
+    expect([...srcs, ...preloaded].filter((u) => FULL.test(u))).toEqual([]);
+    const loaded = () => images.created.map((i) => i.getAttribute("src") ?? "").filter((u) => FULL.test(u));
+    expect(loaded()).toEqual([]);
+
+    const zoom = root.querySelector<HTMLButtonElement>(".post__zoom")!;
+    zoom.click();
+    const dialog = viewer()!;
+    expect(dialog.open).toBe(true);
+    expect(dialog.querySelector(".viewer__image")?.getAttribute("src")).toBe(zoom.querySelector("img")?.getAttribute("src"));
+    expect(loaded()).toHaveLength(1); // the full image, only now
+
+    const popped = nextPopState();
+    dialog.querySelector<HTMLButtonElement>(".viewer__close")!.click();
+    await popped;
+    expect(document.activeElement).toBe(zoom);
+  });
+
+  test("a return after 10 minutes in the background closes the viewer and removes its entry", async () => {
+    const w = fakeWindow(`#/d/${NAIA.rkey}`);
+    const { clock } = await start(w.win);
+    root.querySelector<HTMLButtonElement>(".post__zoom")!.click();
+    expect(isViewerState(history.state)).toBe(true);
+    const back = vi.spyOn(history, "back");
+    const popped = nextPopState();
+    w.doc.visibilityState = "hidden";
+    w.doc.dispatchEvent(new Event("visibilitychange"));
+    clock.t += 11 * 60_000;
+    w.doc.visibilityState = "visible";
+    w.doc.dispatchEvent(new Event("visibilitychange"));
+    expect(viewer()).toBeNull();
+    await popped;
+    expect(back).toHaveBeenCalledTimes(1);
+    expect(isViewerState(history.state)).toBe(false);
+  });
+
+  test("a navigation to another drawing while open closes it without going back", async () => {
+    location.hash = `#/d/${NAIA.rkey}`;
+    await nextPopState();
+    await start();
+    root.querySelector<HTMLButtonElement>(".post__zoom")!.click();
+    expect(viewer()?.open).toBe(true);
+    const back = vi.spyOn(history, "back");
+    location.hash = `#/d/${LEON}`;
+    await vi.waitFor(() => expect(root.querySelector(".post__byline strong")?.textContent).toBe("León"));
+    await settle();
+    expect(viewer()).toBeNull();
+    expect(back).not.toHaveBeenCalled();
+    expect(location.hash).toBe(`#/d/${LEON}`);
+  });
+
+  test("at start-up a leftover viewer state is replaced", async () => {
+    history.pushState({ viewer: true }, "");
+    const stopApp = startApp(document.createElement("main"), { config: CONFIG, fetchFn: server().fn, storage: null, now: () => NOW }).stop;
+    expect(history.state).toBeNull();
+    stopApp();
+  });
 });
