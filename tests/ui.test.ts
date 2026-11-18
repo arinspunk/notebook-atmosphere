@@ -516,6 +516,17 @@ describe("renderDrawing (6.2)", () => {
     const el2 = render(noAlt);
     expect(el2.querySelector(".post__zoom")?.getAttribute("aria-label")).toBe("Ver o desenho em grande");
     expect(el2.querySelector(".post__image")?.getAttribute("alt")).toBe("");
+    // A final full stop or ellipsis is not repeated in the name; the img keeps its alt.
+    for (const alt of ["Na praia.", "Na praia…", "Na praia ...", " Na praia. "]) {
+      const p = rootPost();
+      p.embed!.images![0]!.alt = alt;
+      const e = render(p);
+      expect(e.querySelector(".post__zoom")?.getAttribute("aria-label")).toBe("Na praia. Ver o desenho em grande");
+      expect(e.querySelector(".post__image")?.getAttribute("alt")).toBe(alt);
+    }
+    const dots = rootPost();
+    dots.embed!.images![0]!.alt = "...";
+    expect(render(dots).querySelector(".post__zoom")?.getAttribute("aria-label")).toBe("Ver o desenho em grande");
     expect(render({ ...rootPost(), embed: undefined }).querySelector(".post__zoom")).toBeNull();
   });
 

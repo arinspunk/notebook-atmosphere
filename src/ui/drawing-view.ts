@@ -51,7 +51,9 @@ function renderImage(post: PostView, i18n: I18n): HTMLButtonElement | null {
     attrs.height = String(ar.height);
   }
   // `aria-label` replaces the name the `img` would give, so it carries the `alt` too.
-  const label = alt.trim() ? i18n.t("viewImageWithAlt", { alt: alt.trim() }) : i18n.t("viewImage");
+  // Without the final full stop or ellipsis, so the name does not read "Na praia.. Ver…".
+  const altName = alt.trim().replace(/[\s.…]+$/u, "");
+  const label = altName ? i18n.t("viewImageWithAlt", { alt: altName }) : i18n.t("viewImage");
   const button = el("button", { class: "post__zoom", type: "button", "aria-label": label }, el("img", attrs));
   const full = viewerImageUrl(img) ?? src;
   button.addEventListener("click", () => openViewer({ thumb: src, full, alt, i18n, returnFocus: button }));

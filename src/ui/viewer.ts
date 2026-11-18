@@ -11,6 +11,11 @@
  * action closes the viewer (`popstate`) without leaving the drawing. Any other
  * close removes that entry with `history.back()`, but only while it is still
  * the current entry, and the `popstate` that follows is ignored.
+ *
+ * `history.back()` is asynchronous. If the viewer opens again before the
+ * `popstate` of a removal arrives, its `pushState` waits for it: otherwise the
+ * pending back would take the new entry, and the next back would leave the
+ * drawing with the viewer still open.
  */
 
 import type { I18n } from "../lib/i18n.ts";
@@ -30,6 +35,8 @@ export interface ViewerInput {
 interface OpenViewer {
   dialog: HTMLDialogElement;
   returnFocus: HTMLElement | null;
+  /** Whether this viewer has pushed its history entry (it may still be waiting to). */
+  pushed: boolean;
 }
 
 /** History state of the entry pushed when the viewer opens. */
@@ -38,6 +45,8 @@ const VIEWER_STATE = { viewer: true } as const;
 let current: OpenViewer | null = null;
 /** `popstate` events still to come from our own `history.back()` calls. */
 let pendingBacks = 0;
+/** The open viewer still has to push its entry, once the pending backs have arrived. */
+let deferredPush = false;
 let listening = false;
 
 /** Whether the current history entry is the one the viewer pushed. */
@@ -49,11 +58,25 @@ function onPopState(): void {
   if (pendingBacks > 0) {
     // The `popstate` of our own `history.back()`: nothing to close.
     pendingBacks--;
+    if (pendingBacks === 0 && deferredPush) {
+      // The viewer reopened while that back was pending: push its entry once
+      // the traversal has finished (pushing inside its own `popstate` is not
+      // reliable everywhere).
+      setTimeout(pushDeferred, 0);
+    }
   } else if (current) {
     // Back while open, or a navigation to another hash: close without going back again.
     close(false);
   }
   updateListener();
+}
+
+/** Pushes the entry of a viewer that opened while one of our backs was pending, if it is still open. */
+function pushDeferred(): void {
+  if (!deferredPush || !current || current.pushed) return;
+  deferredPush = false;
+  history.pushState(VIEWER_STATE, "");
+  current.pushed = true;
 }
 
 /** The `popstate` listener exists only while the viewer is open or one of our backs is pending. */
@@ -68,12 +91,15 @@ function close(removeEntry: boolean): void {
   const open = current;
   if (!open) return;
   current = null; // first, so the dialog's own `close` event does not come back here
+  deferredPush = false; // closed before its entry was pushed: nothing to push or remove
   if (open.dialog.open) open.dialog.close();
   open.dialog.remove();
   if (open.returnFocus?.isConnected) open.returnFocus.focus();
-  // Without this guard, a re-render caused by a navigation to another drawing
-  // would send the visitor back to the previous one.
-  if (removeEntry && isViewerState(history.state)) {
+  // Only an entry this viewer pushed is removed. `history.state` alone is not
+  // enough: while an earlier back is pending it still shows the old entry. And
+  // without the state check, a re-render caused by a navigation to another
+  // drawing would send the visitor back to the previous one.
+  if (removeEntry && open.pushed && isViewerState(history.state)) {
     pendingBacks++;
     history.back();
   }
@@ -91,7 +117,7 @@ export function openViewer({ thumb, full, alt, i18n, returnFocus = null }: Viewe
   const image = el("img", { class: "viewer__image", src: thumb, alt });
   const closeButton = el("button", { class: "viewer__close", type: "button", "aria-label": i18n.t("close") }, "×");
   const dialog = el("dialog", { class: "viewer" }, closeButton, image);
-  const open: OpenViewer = { dialog, returnFocus };
+  const open: OpenViewer = { dialog, returnFocus, pushed: false };
 
   // The dialog covers the whole screen: any click that is not on the image
   // (the close button, the margins, the backdrop) closes it.
@@ -111,7 +137,12 @@ export function openViewer({ thumb, full, alt, i18n, returnFocus = null }: Viewe
   document.body.append(dialog);
   dialog.showModal();
   current = open;
-  history.pushState(VIEWER_STATE, "");
+  if (pendingBacks > 0) {
+    deferredPush = true; // see the note on history at the top
+  } else {
+    history.pushState(VIEWER_STATE, "");
+    open.pushed = true;
+  }
   updateListener();
 
   if (full !== thumb) {

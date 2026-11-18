@@ -135,7 +135,40 @@ describe("viewer (image-viewer 3.1)", () => {
     expect(viewer()).toBeNull();
     expect(back).not.toHaveBeenCalled();
     back.mockRestore();
+    // Wait for the popstate of this hash change too, so it does not leak into the next test.
+    const reset = nextPopState();
     location.hash = "";
+    await reset;
+  });
+
+  test("closing and reopening at once keeps the history entry, and back still closes", async () => {
+    open();
+    const removal = nextPopState();
+    viewer()!.querySelector<HTMLButtonElement>(".viewer__close")!.click();
+    open(); // before the popstate of the removal has arrived; its push waits for it
+    await removal;
+    await new Promise((r) => setTimeout(r, 0)); // the deferred push runs after the traversal
+    expect(viewer()?.open).toBe(true);
+    expect(isViewerState(history.state)).toBe(true);
+    const back = nextPopState();
+    history.back();
+    await back;
+    expect(viewer()).toBeNull(); // back closed the viewer instead of leaving the drawing
+  });
+
+  test("reopened and closed again before the removal arrives: nothing left behind", async () => {
+    open();
+    const back = vi.spyOn(history, "back");
+    const removal = nextPopState();
+    viewer()!.querySelector<HTMLButtonElement>(".viewer__close")!.click();
+    open();
+    closeViewer(); // its entry was never pushed: no second back
+    await removal;
+    await new Promise((r) => setTimeout(r, 0));
+    expect(viewer()).toBeNull();
+    expect(isViewerState(history.state)).toBe(false);
+    expect(back).toHaveBeenCalledTimes(1);
+    back.mockRestore();
   });
 
   test("closeViewer without an open viewer does nothing", () => {
