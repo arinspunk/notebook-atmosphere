@@ -121,10 +121,90 @@ function overlapCoversText(css: string): boolean {
   return rem(css, "note-overlap") >= rem(css, "note-padding-block");
 }
 
+const repliesCss = readProjectFile("src/styles/components/replies.css");
+
+/** Declarations of the first rule whose selector is exactly `selector`. */
+function rule(css: string, selector: string): string | undefined {
+  const clean = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  const esc = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`(?:^|})\\s*${esc}\\s*{([^}]*)}`).exec(clean)?.[1];
+}
+
+/** Value of `--name: var(--target)` in a block, or `null`. */
+function varRef(block: string | undefined, name: string): string | null {
+  return block ? (new RegExp(`--${name}:\\s*var\\(--([a-z0-9-]+)\\)`).exec(block)?.[1] ?? null) : null;
+}
+
+/**
+ * Problems in the colour cycles of replies.css (decision 4): simulates threads
+ * with 0 to 4 stuck notes, in the order they show on screen, and reports any
+ * two neighbours with the same colour, a thread off the 1, 2, 3, 4 cycle, or
+ * a note whose ink is not its paper's.
+ */
+function colourProblems(css: string): string[] {
+  const out: string[] = [];
+  const threads = [1, 2, 3, 4].map((k) => rule(css, `.replies__thread:nth-child(4n + ${k})`));
+  const slot = (selector: string) => {
+    const block = rule(css, selector);
+    const note = varRef(block, "note")?.replace(/^note-/, "") ?? null;
+    if (note && varRef(block, "note-ink") !== `note-${note}-ink`) out.push(`${selector}: ink is not its paper's`);
+    return note;
+  };
+  const main = slot(".replies__thread > .reply");
+  const stuck = [1, 2, 3].map((k) => slot(`.replies__followups > .reply:nth-child(3n + ${k})`));
+  /** Colour number of `slotName` (own, a, b) in thread `t` (0-based), checking its ink. */
+  const colour = (t: number, slotName: string | null): number | null => {
+    const block = threads[t % 4];
+    const paper = slotName && varRef(block, `note-${slotName}`);
+    const n = paper ? /^color-note-(\d+)$/.exec(paper)?.[1] : undefined;
+    if (!n) return null;
+    if (varRef(block, `note-${slotName}-ink`) !== `color-note-${n}-ink`) out.push(`thread 4n + ${(t % 4) + 1}: ${slotName} ink is not its paper's`);
+    return Number(n);
+  };
+  for (let counts = 0; counts < 5 ** 4; counts++) {
+    const sequence: (number | null)[] = [];
+    for (let t = 0; t < 5; t++) {
+      const c = colour(t, main);
+      if (c !== ((t % 4) + 1)) out.push(`thread ${t + 1} is colour ${c}`);
+      sequence.push(c);
+      const n = t < 4 ? Math.floor(counts / 5 ** t) % 5 : 0;
+      for (let f = 0; f < n; f++) sequence.push(colour(t, stuck[f % 3]!));
+    }
+    sequence.forEach((c, i) => {
+      if (c === null) out.push(`note ${i + 1} has no colour`);
+      else if (i > 0 && c === sequence[i - 1]) out.push(`notes ${i} and ${i + 1} are both colour ${c}`);
+    });
+    if (out.length) break;
+  }
+  return [...new Set(out)];
+}
+
 describe("sticky notes (reply-notes)", () => {
   test("--note-overlap is smaller than --note-padding-block", () => {
     expect(overlapCoversText(themeCss)).toBe(false);
     expect(overlapCoversText(themeCss.replace(/--note-overlap:[^;]+;/, "--note-overlap: 1.5rem;"))).toBe(true);
+  });
+
+  test("colour cycles: threads 1, 2, 3, 4 and no two notes in a row alike, stuck notes included", () => {
+    expect(repliesCss.trim()).not.toBe("");
+    expect(colourProblems(repliesCss)).toEqual([]);
+  });
+
+  test("the colour check catches a stuck note matching the next thread, a wrong ink and a missing rule", () => {
+    // Thread 1's `a` set to colour 2: a single stuck note matches thread 2 below it.
+    const sameAsNext = repliesCss.replace(
+      /(nth-child\(4n \+ 1\)\s*{[^}]*--note-a:\s*)var\(--color-note-3\);(\s*--note-a-ink:\s*)var\(--color-note-3-ink\)/,
+      "$1var(--color-note-2);$2var(--color-note-2-ink)",
+    );
+    expect(sameAsNext).not.toBe(repliesCss);
+    expect(colourProblems(sameAsNext)).toContainEqual(expect.stringMatching(/both colour 2/));
+    // Paper and ink of different colours.
+    const wrongInk = repliesCss.replace(/(nth-child\(4n \+ 2\)\s*{[^}]*--note-own-ink:\s*)var\(--color-note-2-ink\)/, "$1var(--color-note-3-ink)");
+    expect(wrongInk).not.toBe(repliesCss);
+    expect(colourProblems(wrongInk)).toContainEqual(expect.stringMatching(/ink is not its paper's/));
+    // A stuck-note slot without its rule.
+    const missing = repliesCss.replace(".replies__followups > .reply:nth-child(3n + 3)", ".replies__followups > .reply:nth-child(3n + 9)");
+    expect(colourProblems(missing)).toContainEqual(expect.stringMatching(/has no colour/));
   });
 });
 

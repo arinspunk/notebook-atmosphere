@@ -24,8 +24,9 @@ Sitio estático (TypeScript + Vite, sin framework ni backend) que muestra los di
 ## Estilos (tras el change `arquitectura-estilos`)
 
 - CSS a secas en `src/styles/`, ordenado con `@layer` (tokens, base, layout, components, utilities); un fichero por componente.
-- Clases BEM en inglés (`post`, `pager`, `replies`, `reply`, `post-list`, `post-card`, `byline`, `status`). Nunca las antiguas en galego.
+- Clases BEM en inglés (`drawing`, `post`, `pager`, `replies`, `reply`, `post-list`, `post-card`, `byline`, `status`, `viewer`). Nunca las antiguas en galego.
 - Los componentes solo usan tokens semánticos de `theme.css`: ningún color literal (hex, `rgb()`, nombres de color…). Texto y foco con contraste suficiente: `--color-accent` es solo decorativo (un test lo comprueba).
+- Sticky notes (`reply`): each paper colour `--color-note-<n>` has its own ink `--color-note-<n>-ink`, a dark, saturated shade of the same hue; a test checks each pair's contrast. The colour cycles live in `replies.css`, and a test checks that no two notes in a row share a colour.
 - Fuentes e imágenes propias en `src/assets/`, nunca como URI `data:`.
 
 ## Particularidades conocidas
