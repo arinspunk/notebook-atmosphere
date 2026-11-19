@@ -21,6 +21,8 @@ const GL = {
   relative: "há {t}",
   // Autoría
   genericName: "o caderno",
+  /** Between the name and the date in a byline: "Toquinho, há 16 h". */
+  bylineSeparator: ", ",
   // Contadores
   likes: { one: "Fiz feliz a {n} amiga 🥰", other: "Fiz feliz a {n} amigas 🥰" } as PluralForms,
   shared: { one: "Partilhado {n} vez", other: "Partilhado {n} vezes" } as PluralForms,

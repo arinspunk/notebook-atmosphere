@@ -38,6 +38,11 @@ function literalColors(css: string): string[] {
 const BACKGROUNDS = ["color-surface", "color-bg"];
 const TEXTS = ["color-text", "color-text-muted", "color-ink", "color-link"];
 
+/** Note backgrounds: every `--color-note-<n>` in the sheet. */
+function noteColors(props: Map<string, string>): string[] {
+  return [...props.keys()].filter((k) => /^color-note-\d+$/.test(k));
+}
+
 /** Pares texto/fondo o foco/fondo por debajo del mínimo; vacío si todo cumple. */
 function contrastProblems(css: string): string[] {
   const props = cssCustomProperties(css);
@@ -50,6 +55,10 @@ function contrastProblems(css: string): string[] {
     }
     const r = contrastRatio(color("color-focus"), color(bg));
     if (r < 3) out.push(`--color-focus sobre --${bg}: ${r.toFixed(2)}`);
+  }
+  for (const note of noteColors(props)) {
+    const r = contrastRatio(color(`${note}-ink`), color(note));
+    if (r < 4.5) out.push(`--${note}-ink sobre --${note}: ${r.toFixed(2)}`);
   }
   return out;
 }
@@ -72,6 +81,13 @@ describe("contraste de los tokens de color", () => {
     expect(contrastProblems(themeCss)).toEqual([]);
   });
 
+  test("reply-notes: four note colours, each ink fails on its paper if it turns white, and a missing ink fails", () => {
+    expect(noteColors(cssCustomProperties(themeCss))).toEqual(["color-note-1", "color-note-2", "color-note-3", "color-note-4"]);
+    const white = contrastProblems(themeCss.replace(/(--color-note-\d+-ink):[^;]+;/g, "$1: #fff;"));
+    expect(white).toEqual([1, 2, 3, 4].map((n) => expect.stringMatching(new RegExp(`^--color-note-${n}-ink sobre --color-note-${n}:`))));
+    expect(() => contrastProblems(themeCss.replace(/--color-note-4-ink:[^;]+;/, ""))).toThrow(/color-note-4-ink/);
+  });
+
   test("falla si un texto o el foco pasan al acento decorativo", () => {
     expect(contrastProblems(themeCss.replace("--color-link: var(--color-ink);", "--color-link: var(--color-accent);"))).toEqual([
       expect.stringMatching(/^--color-link sobre --color-surface/),
@@ -92,10 +108,30 @@ describe("contraste de los tokens de color", () => {
   });
 });
 
+/** `rem` value of a token, or an error if it is not in `rem`. */
+function rem(css: string, name: string): number {
+  const v = resolveToken(cssCustomProperties(css), name);
+  const m = /^(\d*\.?\d+)rem$/.exec(v);
+  if (!m) throw new Error(`--${name} is not in rem: ${v}`);
+  return Number(m[1]);
+}
+
+/** A stuck note must overlap the one before it by less than its bottom padding. */
+function overlapCoversText(css: string): boolean {
+  return rem(css, "note-overlap") >= rem(css, "note-padding-block");
+}
+
+describe("sticky notes (reply-notes)", () => {
+  test("--note-overlap is smaller than --note-padding-block", () => {
+    expect(overlapCoversText(themeCss)).toBe(false);
+    expect(overlapCoversText(themeCss.replace(/--note-overlap:[^;]+;/, "--note-overlap: 1.5rem;"))).toBe(true);
+  });
+});
+
 describe("colores en los componentes", () => {
   test("los componentes no usan colores literales; el comprobador los detecta", () => {
     const files = readCssDir("src/styles/components");
-    expect(Object.keys(files).length).toBe(9);
+    expect(Object.keys(files).length).toBe(10);
     for (const [f, css] of Object.entries(files)) {
       expect(css.trim(), f).not.toBe(""); // si la lectura falla, el test no puede pasar en vacío
       expect(literalColors(css), f).toEqual([]);

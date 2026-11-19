@@ -15,7 +15,7 @@ import type { I18n } from "../lib/i18n.ts";
 import { cleanCadernoSegments, facetSegments } from "../lib/text.ts";
 import type { PostView } from "../lib/types.ts";
 import { drawingHref, INDEX_HREF } from "../router.ts";
-import { el, renderSegments, renderTime } from "./dom.ts";
+import { el, renderByline, renderSegments } from "./dom.ts";
 import { openViewer } from "./viewer.ts";
 
 export interface DrawingViewInput {
@@ -84,8 +84,9 @@ export function renderReply(post: PostView, config: Config, i18n: I18n, now?: nu
   return el(
     "article",
     { class: followup ? "reply reply--followup" : "reply" },
-    el("header", { class: "reply__header byline" }, el("strong", { class: "byline__name" }, name), " ", renderTime(record.createdAt, i18n, now, "byline__date")),
     text,
+    // After the text, as in Figma: who wrote it and when, signing the note.
+    renderByline({ tag: "footer", className: "reply__footer byline byline--note", name, iso: record.createdAt, i18n, now }),
   );
 }
 
@@ -120,6 +121,7 @@ export interface DrawingShellInput {
 }
 
 export interface DrawingShell {
+  /** The `drawing` block: the sheet (`post`) and, after it, the replies. */
   element: HTMLElement;
   /** Coloca la imagen en su hueco, los contadores y las tarjetas. */
   fill(post: PostView, cards: Card[]): void;
@@ -136,26 +138,29 @@ export function renderDrawingShell({ drawing, neighbours, config, i18n, now }: D
   const recordRatio = recordAspectRatio(drawing.record);
   if (figure && recordRatio) setRatio(figure, recordRatio);
   const nav = renderNav(neighbours, i18n);
-  const element = el(
+  const post = el(
     "article",
     { class: "post" },
     figure,
     segments.length ? el("p", { class: "post__text" }, renderSegments(segments)) : null,
-    el(
-      "p",
-      { class: "post__byline byline byline--large" },
-      el("strong", { class: "byline__name" }, drawing.nombre ?? i18n.t("genericName")),
-      " ",
-      renderTime(drawing.record.createdAt, i18n, now, "byline__date"),
-    ),
+    renderByline({
+      tag: "p",
+      className: "post__byline byline byline--large",
+      name: drawing.nombre ?? i18n.t("genericName"),
+      iso: drawing.record.createdAt,
+      i18n,
+      now,
+    }),
     nav,
   );
+  // The replies go after the sheet, outside it (reply-notes, decision 1).
+  const element = el("div", { class: "drawing" }, post);
 
   /** Sustituye el hueco por `node` (o lo quita si es `null`). */
   const replaceFigure = (node: HTMLElement | null) => {
     if (figure && node) figure.replaceWith(node);
     else if (figure) figure.remove();
-    else if (node) element.prepend(node);
+    else if (node) post.prepend(node);
     figure = node;
   };
 
@@ -177,7 +182,7 @@ export function renderDrawingShell({ drawing, neighbours, config, i18n, now }: D
         ].filter((n): n is HTMLParagraphElement => n !== null),
       );
       const section = renderCards(cards, config, i18n, now);
-      if (section) element.append(section);
+      if (section) element.append(section); // after the sheet, inside `drawing`
     },
     fail() {
       replaceFigure(el("p", { class: "status status--error", role: "status" }, i18n.t("threadError")));

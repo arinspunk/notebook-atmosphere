@@ -1,0 +1,10 @@
+/*
+ * Block `drawing`: the page of a drawing. The sheet (`post`) and, below it and
+ * outside it, the replies as sticky notes (`replies`), in one column.
+ */
+
+.drawing {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}

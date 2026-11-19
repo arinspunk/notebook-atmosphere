@@ -1,11 +1,8 @@
-/* Bloque `byline`: nombre y fecha. Lo colocan `post__byline`, `reply__header` y `post-card__byline`. */
-
-.byline {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--space-2);
-}
+/*
+ * Bloque `byline`: nombre y fecha. Lo colocan `post__byline`, `reply__footer` y `post-card__byline`.
+ * Inline text, not a flex row: the separator (", ") must sit right after the
+ * name, which a flex `gap` would push apart.
+ */
 
 .byline__name {
   font-weight: 700;
@@ -18,12 +15,23 @@
 
 /* Autoría del dibujo: más grande y con la fecha sin atenuar. */
 .byline--large {
-  gap: 0.3em;
   font-size: var(--font-size-lg);
   line-height: var(--line);
 }
 
 .byline--large .byline__date {
   color: var(--color-text);
+  font-size: inherit;
+}
+
+/* Byline of a sticky note: name and date in the same size and in the note's ink. */
+.byline--note {
+  color: var(--note-ink);
+  font-size: var(--note-font-size);
+  line-height: var(--note-line);
+}
+
+.byline--note .byline__date {
+  color: inherit;
   font-size: inherit;
 }

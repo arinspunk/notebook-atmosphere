@@ -10,7 +10,7 @@ import { firstImage } from "../embed.ts";
 import type { I18n } from "../lib/i18n.ts";
 import type { FetchFn } from "../xrpc.ts";
 import { drawingHref } from "../router.ts";
-import { el, isWebUrl, renderTime } from "./dom.ts";
+import { el, isWebUrl, renderByline } from "./dom.ts";
 
 export interface IndexView {
   element: HTMLElement;
@@ -30,13 +30,7 @@ export function renderIndex(catalog: Drawing[], i18n: I18n, now?: number): Index
         "a",
         { class: "post-card", href: drawingHref(d.rkey) },
         slot,
-        el(
-          "span",
-          { class: "post-card__byline byline" },
-          el("strong", { class: "byline__name" }, d.nombre ?? i18n.t("genericName")),
-          " ",
-          renderTime(d.record.createdAt, i18n, now, "byline__date"),
-        ),
+        renderByline({ tag: "span", className: "post-card__byline byline", name: d.nombre ?? i18n.t("genericName"), iso: d.record.createdAt, i18n, now }),
       ),
     );
   });

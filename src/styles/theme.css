@@ -23,8 +23,25 @@
   --color-border: rgba(8, 0, 55, .5);
   --color-backdrop: rgba(8, 0, 55, 0.8); /* dark ink behind the viewer; never for text */
 
+  /*
+   * Sticky notes of the replies (Figma component `Post it`), in a cycle by
+   * position (replies.css). Each paper colour has its own ink: the same hue,
+   * fully saturated and very dark (in a colour picker, diagonally down from
+   * the paper). Adding a colour means a new pair of tokens and changing the
+   * cycles in replies.css. A test checks each ink on its paper.
+   */
+  --color-note-1: #fffb86; /* yellow */
+  --color-note-1-ink: #292400;
+  --color-note-2: #d5c1ff; /* lilac */
+  --color-note-2-ink: #0d0029;
+  --color-note-3: #94fffd; /* cyan */
+  --color-note-3-ink: #002928;
+  --color-note-4: #feb7ec; /* pink */
+  --color-note-4-ink: #29001f;
+
   /* Sombras */
   --shadow-sheet: -1px 7px 4px -5px rgb(0 0 0 / 0.3);
+  --shadow-note: -1px 7px 4px -5px rgb(0 0 0 / 0.25);
 
   /* Tipografía. "Caderno Letra" es Andika (SIL, OFL) recortada: ver fonts.css. */
   --font-body: "Caderno Letra", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -66,4 +83,15 @@
   --sheet-padding: 2.1875rem;
   --sheet-rings: 1.875rem; /* 30 px más a la izquierda para las anillas */
   --sheet-rings-tile-width: 2.0625rem; /* 33 px: ancho de notebook-rings.png a 1x */
+
+  /* Sticky notes of the replies */
+  --note-size: 22.5rem; /* 360 px: side of the note */
+  --note-padding: 1.875rem; /* 30 px at the sides */
+  --note-padding-block: 1.5rem; /* 24 px at the top and bottom, so 300 characters fit */
+  --note-font-size: 1.125rem; /* 18 px */
+  --note-line: 1.6875rem; /* 27 px */
+  --note-indent: 4rem; /* indent of replies to a reply */
+  --note-overlap: 1.25rem; /* 20 px over the note before; must stay below --note-padding-block (tested) */
+  --note-tilt: 1deg;
+  --note-shift: min(1.5rem, 4vw); /* zigzag offset */
 }

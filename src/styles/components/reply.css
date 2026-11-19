@@ -1,11 +1,46 @@
-/* Bloque `reply`: una respuesta. `reply--followup` en el segundo nivel. */
+/*
+ * Block `reply`: one reply as a sticky note (Figma component `Post it`).
+ * `reply--followup` is a reply to a reply, stuck on the note before it.
+ *
+ * A square of `--note-size` (or the available width) that only grows if its
+ * content needs it, with the content centred vertically. Its colour and ink,
+ * `--note` and `--note-ink`, come from replies.css.
+ */
 
 .reply {
-  margin-block: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-2);
+  width: min(100%, var(--note-size));
+  aspect-ratio: 1;
+  padding: var(--note-padding-block) var(--note-padding);
+  background-color: var(--note);
+  box-shadow: var(--shadow-note);
+  color: var(--note-ink);
+}
+
+/*
+ * Overlaps the note before it by `--note-overlap`, which stays below
+ * `--note-padding-block` (a test checks it), so it never covers that note's
+ * text or byline. `position: relative` paints it over that note's text.
+ */
+.reply--followup {
+  position: relative;
+  margin-block-start: calc(-1 * var(--note-overlap));
 }
 
 .reply__text {
-  margin-block: var(--space-1);
+  margin: 0;
+  color: var(--note-ink);
+  font-size: var(--note-font-size);
+  font-style: normal;
+  line-height: var(--note-line);
   white-space: pre-line;
   overflow-wrap: anywhere; /* las URLs largas de respuestas ajenas no desbordan en móvil */
+}
+
+/* The byline, below the text, right-aligned, as in Figma. */
+.reply__footer {
+  text-align: end;
 }

@@ -57,3 +57,23 @@ export function renderTime(iso: string | undefined, i18n: I18n, now: number = Da
     formatRelativeTime(iso, i18n, now),
   );
 }
+
+export interface BylineInput {
+  /** Element that holds the byline: `p` in the drawing, `footer` in a reply, `span` in the index. */
+  tag: "p" | "footer" | "span";
+  className: string;
+  name: string;
+  iso: string | undefined;
+  i18n: I18n;
+  now?: number;
+}
+
+/**
+ * Name and date as "name, date": `strong.byline__name` and, only if the date
+ * is valid, the dictionary's separator and `time.byline__date`. An invalid
+ * date leaves only the name, with no trailing separator.
+ */
+export function renderByline({ tag, className, name, iso, i18n, now }: BylineInput): HTMLElement {
+  const time = renderTime(iso, i18n, now, "byline__date");
+  return el(tag, { class: className }, el("strong", { class: "byline__name" }, name), time && i18n.t("bylineSeparator"), time);
+}

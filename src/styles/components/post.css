@@ -13,6 +13,7 @@
   display: flex;
   flex-direction: column;
   max-width: var(--sheet-width);
+  min-width: var(--sheet-width);
   min-height: var(--sheet-height);
   margin-inline: auto;
   padding: var(--sheet-padding);
@@ -71,7 +72,6 @@
 
 /* Autoría y contadores, a la derecha. */
 .post__byline {
-  justify-content: flex-end;
   margin: var(--space-4) 0 0;
   text-align: end;
 }

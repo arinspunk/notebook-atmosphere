@@ -1,9 +1,132 @@
-/* Bloque `replies`: tarjetas de respuestas. */
+/*
+ * Block `replies`: the sticky notes below the sheet (Figma, desktop frame).
+ *
+ * - Each `replies__thread` is a direct reply: a separate note, slightly
+ *   rotated, zigzagging left and right by position.
+ * - Its `replies__followups` (all the replies to it, flattened) are notes
+ *   stuck on top of the note before them (see reply.css).
+ *
+ * Colours by position, from the four `--color-note-<n>` tokens, each with its
+ * own ink (`--color-note-<n>-ink`):
+ *
+ * - Threads cycle 1, 2, 3, 4, so neighbouring threads never share a colour.
+ * - The stuck notes of a thread of colour n cycle the three colours that are
+ *   not the next thread's (n + 1): n + 2, n + 3, n. The first one differs
+ *   from the main note, two in a row never match, and the last one never
+ *   matches the next thread, the note right below it.
+ *
+ * Each thread sets those three colours (`own`, `a`, `b`) and each note picks
+ * one as `--note` and `--note-ink`. Changing the number of colours means
+ * changing both cycles below.
+ */
 
-.replies__thread {
-  margin-block: var(--space-4);
+.replies {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  /*
+   * The zigzag never creates horizontal scroll. The padding keeps the corners
+   * of the rotated notes, and their shadow, inside the clipping box on narrow
+   * screens.
+   */
+  padding-inline: var(--space-3);
+  overflow-x: clip;
+  container-type: inline-size; /* `cqi` below: the width of the column */
 }
 
+/*
+ * The direct reply fills the thread, so the main notes stay on the sheet's
+ * axis, and the zigzag offset fits inside the column even on narrow screens.
+ *
+ * Stuck notes are as wide as the main one and stick out by the indent on the
+ * end side. The indent is `--note-indent` when the column has room for it,
+ * and shrinks (down to 0 on a phone) when it does not, so no note ever
+ * shrinks or gets cut off. The room is measured on a thread shifted towards
+ * the end side, the worst case, so every thread gets the same indent.
+ */
+.replies__thread {
+  --note-width: min(calc(100cqi - 2 * var(--note-shift)), var(--note-size));
+  --note-indent-fit: clamp(0px, calc((100cqi - var(--note-width)) / 2 - var(--note-shift)), var(--note-indent));
+  width: var(--note-width);
+}
+
+.replies__thread:nth-child(odd) {
+  rotate: calc(-1 * var(--note-tilt));
+  translate: var(--note-shift);
+}
+
+.replies__thread:nth-child(even) {
+  rotate: var(--note-tilt);
+  translate: calc(-1 * var(--note-shift));
+}
+
+.replies__thread:nth-child(4n + 1) {
+  --note-own: var(--color-note-1);
+  --note-own-ink: var(--color-note-1-ink);
+  --note-a: var(--color-note-3);
+  --note-a-ink: var(--color-note-3-ink);
+  --note-b: var(--color-note-4);
+  --note-b-ink: var(--color-note-4-ink);
+}
+
+.replies__thread:nth-child(4n + 2) {
+  --note-own: var(--color-note-2);
+  --note-own-ink: var(--color-note-2-ink);
+  --note-a: var(--color-note-4);
+  --note-a-ink: var(--color-note-4-ink);
+  --note-b: var(--color-note-1);
+  --note-b-ink: var(--color-note-1-ink);
+}
+
+.replies__thread:nth-child(4n + 3) {
+  --note-own: var(--color-note-3);
+  --note-own-ink: var(--color-note-3-ink);
+  --note-a: var(--color-note-1);
+  --note-a-ink: var(--color-note-1-ink);
+  --note-b: var(--color-note-2);
+  --note-b-ink: var(--color-note-2-ink);
+}
+
+.replies__thread:nth-child(4n + 4) {
+  --note-own: var(--color-note-4);
+  --note-own-ink: var(--color-note-4-ink);
+  --note-a: var(--color-note-2);
+  --note-a-ink: var(--color-note-2-ink);
+  --note-b: var(--color-note-3);
+  --note-b-ink: var(--color-note-3-ink);
+}
+
+.replies__thread > .reply {
+  --note: var(--note-own);
+  --note-ink: var(--note-own-ink);
+}
+
+/* Replies to a reply: indented once, as wide as the main note, stuck on the note before them. */
 .replies__followups {
-  margin-inline-start: var(--space-6);
+  margin-inline: var(--note-indent-fit) calc(-1 * var(--note-indent-fit));
+}
+
+.replies__followups > .reply:nth-child(odd) {
+  rotate: var(--note-tilt);
+}
+
+.replies__followups > .reply:nth-child(even) {
+  rotate: calc(-1 * var(--note-tilt));
+  margin-left: -10px;
+}
+
+.replies__followups > .reply:nth-child(3n + 1) {
+  --note: var(--note-a);
+  --note-ink: var(--note-a-ink);
+}
+
+.replies__followups > .reply:nth-child(3n + 2) {
+  --note: var(--note-b);
+  --note-ink: var(--note-b-ink);
+}
+
+.replies__followups > .reply:nth-child(3n + 3) {
+  --note: var(--note-own);
+  --note-ink: var(--note-own-ink);
 }

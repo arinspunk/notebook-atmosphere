@@ -16,6 +16,7 @@
 @import "./base.css" layer(base);
 @import "./layout.css" layer(layout);
 @import "./components/byline.css" layer(components);
+@import "./components/drawing.css" layer(components);
 @import "./components/post.css" layer(components);
 @import "./components/pager.css" layer(components);
 @import "./components/replies.css" layer(components);
