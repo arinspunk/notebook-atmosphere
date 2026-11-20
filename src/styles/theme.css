@@ -14,9 +14,9 @@
   /* Color: por función, no por tono. Un test comprueba el contraste. */
   --color-bg: #FFD6D6; /* fondo de la página */
   --color-surface: #fff; /* la hoja */
-  --color-text: #000;
+  --color-text: #311212;
   --color-text-muted: #555;
-  --color-ink: #000;
+  --color-ink: #311212;
   --color-link: var(--color-ink);
   --color-focus: var(--color-ink);
   --color-accent: #84fefc; /* solo decoración: no llega a 4,5:1 sobre los fondos */
