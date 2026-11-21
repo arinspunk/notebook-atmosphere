@@ -1,10 +1,25 @@
 /*
- * Block `drawing`: the page of a drawing. The sheet (`post`) and, below it and
- * outside it, the replies as sticky notes (`replies`), in one column.
+ * Block `drawing`: the page of a drawing. The `sheet` element holds the sheet
+ * (`post`) and its arrows (`pager`); below it and outside it come the replies
+ * as sticky notes (`replies`), in one column.
  */
 
 .drawing {
   display: flex;
   flex-direction: column;
   gap: var(--space-7);
+  /* Room for the bottom bar of arrows, so it covers nothing at the end. */
+  padding-block-end: calc(var(--pager-arrow-size) + 2 * var(--pager-bar-padding) + env(safe-area-inset-bottom));
+}
+
+/* The arrows are placed against this box when they sit beside the sheet. */
+.drawing__sheet {
+  position: relative;
+}
+
+/* Same breakpoint as pager.css: the arrows beside the sheet, no bar. */
+@media (width >= 39.25rem) {
+  .drawing {
+    padding-block-end: 0;
+  }
 }

@@ -15,6 +15,7 @@
 @import "./fonts.css" layer(base);
 @import "./base.css" layer(base);
 @import "./layout.css" layer(layout);
+@import "./components/site-header.css" layer(components);
 @import "./components/byline.css" layer(components);
 @import "./components/drawing.css" layer(components);
 @import "./components/post.css" layer(components);

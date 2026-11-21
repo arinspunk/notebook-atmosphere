@@ -1,0 +1,42 @@
+/*
+ * Block `site-header`: the notebook's name (the place of the future logo) at
+ * the start, and the link to every drawing at the end. Not fixed: it scrolls
+ * with the page. Provisional styles, like the text logo.
+ */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: var(--measure-full);
+  padding: var(--space-4);
+  height: var(--space-8);
+  font-size: var(--font-size-lg);
+}
+
+.site-header__logo,
+.site-header__index {
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.site-header__logo:hover,
+.site-header__logo:focus-visible,
+.site-header__index:hover,
+.site-header__index:focus-visible {
+  text-decoration: underline;
+}
+
+.site-header__logo {
+  font-family: var(--font-heading);
+  line-height: var(--line-height-tight);
+}
+
+/* On the index, the link is the current page. */
+.site-header__index[aria-current="page"] {
+  text-decoration: underline;
+}

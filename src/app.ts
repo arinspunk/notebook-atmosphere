@@ -20,6 +20,7 @@ import type { KeyValueStorage } from "./likes.ts";
 import { INDEX_HREF, parseRoute, type Route } from "./router.ts";
 import { el } from "./ui/dom.ts";
 import { renderDrawingShell } from "./ui/drawing-view.ts";
+import { markCurrent, renderHeader } from "./ui/header.ts";
 import { loadThumbnails, renderIndex } from "./ui/index-view.ts";
 import { closeViewer, isViewerState } from "./ui/viewer.ts";
 import type { FetchFn } from "./xrpc.ts";
@@ -32,6 +33,8 @@ export interface AppDeps {
   now?: () => number;
   /** Lleva una imagen a la caché HTTP del navegador; se sustituye en los tests. */
   preloadImage?: (src: string) => void;
+  /** The site header, outside `root`; filled once and kept across routes. */
+  header?: HTMLElement | null;
 }
 
 function preloadWithImage(src: string): void {
@@ -64,6 +67,9 @@ export function startApp(root: HTMLElement, deps: AppDeps, win: Window = window)
   const drawingsMemo = memoDrawings({ config, fetchFn, storage, now });
   const preloadImage = deps.preloadImage ?? preloadWithImage;
   let generation = 0;
+  const header = deps.header ?? null;
+  // Before the catalogue loads, so it is there in every status message.
+  if (header) renderHeader(header, i18n);
 
   // A reload while the viewer was open leaves its history entry as the current
   // one; without the viewer it means nothing, so it is cleared (image-viewer, Risks).
@@ -81,6 +87,7 @@ export function startApp(root: HTMLElement, deps: AppDeps, win: Window = window)
       if (isCurrent()) root.replaceChildren(node);
     };
     const route = parseRoute(win.location.hash);
+    if (header) markCurrent(header, route.name === "index");
 
     let drawings = getCatalog.peek();
     if (!drawings) {

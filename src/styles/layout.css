@@ -1,7 +1,9 @@
-/* Contenedor de la página. Header y footer llegarán en una fase posterior. */
+/* Page container. The site header comes before it and gives the top space. */
 
 .app {
   max-width: var(--measure);
   margin-inline: auto;
-  padding: var(--space-10) var(--space-4) var(--space-12);
+  padding-block: var(--space-7) var(--space-12);
+  /* Out of the notch in landscape (viewport-fit=cover in index.html). */
+  padding-inline: max(var(--space-4), env(safe-area-inset-left)) max(var(--space-4), env(safe-area-inset-right));
 }

@@ -139,7 +139,7 @@ describe("startApp (6.1)", () => {
 
   test("navegar con el hash", async () => {
     const { root, app } = await open("#/");
-    root.querySelector<HTMLAnchorElement>("a[rel=prev]")!.click();
+    root.querySelector<HTMLAnchorElement>("a[rel=next]")!.click(); // book order: next is the older one
     location.hash = "#/d/3n2hlsmfo5k2w";
     await app.render();
     expect(root.querySelector(".post__byline strong")?.textContent).toBe("Naia");
@@ -243,7 +243,7 @@ describe("navegar entre dibujos (1.2)", () => {
     go(`#/d/${NAIA.rkey}`);
     await vi.waitFor(() => expect(root.textContent).toContain("Não foi possível carregar este desenho."));
     expect(root.querySelector(".post__byline strong")?.textContent).toBe("Naia");
-    expect(root.querySelector("nav a[rel=next]")).not.toBeNull();
+    expect(root.querySelector("nav a[rel=prev]")).not.toBeNull(); // Naia is the oldest
   });
 });
 
@@ -558,17 +558,17 @@ describe("renderDrawing (6.2)", () => {
   });
 
   test("enlaces anterior y siguiente según el catálogo", () => {
-    const el = render(rootPost()); // Naia es el más antiguo
-    expect(el.querySelector("a[rel=prev]")).toBeNull();
-    expect(el.querySelector("a[rel=next]")?.getAttribute("href")).toBe("#/d/3n2hlw4u4k22y");
-    expect(el.querySelector('a[href="#/indice"]')).not.toBeNull();
+    const el = render(rootPost()); // Naia is the oldest: only "previous", to the newer one
+    expect(el.querySelector("a[rel=next]")).toBeNull();
+    expect(el.querySelector("a[rel=prev]")?.getAttribute("href")).toBe("#/d/3n2hlw4u4k22y");
+    expect(el.querySelector('a[href="#/indice"]')).toBeNull(); // the index is in the header
   });
 });
 
 describe("pintado en dos fases (1.1)", () => {
   const shell = (drawing: Drawing = NAIA) => renderDrawingShell({ drawing, neighbours: findDrawing(catalog, drawing.rkey), config: CONFIG, i18n, now: NOW });
   /** The sheet inside the `drawing` block. */
-  const sheet = (s: ReturnType<typeof shell>) => s.element.querySelector(":scope > .post")!;
+  const sheet = (s: ReturnType<typeof shell>) => s.element.querySelector(":scope > .drawing__sheet > .post")!;
 
   test("image-viewer 4.3: the slot is reserved with the record's proportion before the image", () => {
     const setAttribute = vi.spyOn(Element.prototype, "setAttribute");
@@ -583,7 +583,7 @@ describe("pintado en dos fases (1.1)", () => {
     expect(sheet(s).firstElementChild).toBe(fig); // el texto va debajo y no se desplaza
     expect(s.element.querySelector(".post__text")?.textContent).toBe("Prova de desenho");
     expect(s.element.querySelector(".post__byline strong")?.textContent).toBe("Naia");
-    expect(s.element.querySelector("nav a[rel=next]")).not.toBeNull();
+    expect(s.element.querySelector("nav a[rel=prev]")).not.toBeNull();
   });
 
   test("image-viewer 4.3: landscape record, invalid values and the AppView's proportion on fill", () => {
@@ -650,8 +650,9 @@ describe("pintado en dos fases (1.1)", () => {
     expect(s.element.querySelectorAll("figure")).toHaveLength(1);
     expect(s.element.querySelector("figure")).toBe(fig);
     expect(fig.querySelector("img")?.alt).toBe("umha chispa de auto-colantes desenhados a mao");
-    expect([...s.element.children].map((c) => c.classList[0])).toEqual(["post", "replies"]);
-    expect([...sheet(s).children].map((c) => c.classList[0])).toEqual(["post__media", "post__text", "post__byline", "post__stat", "pager"]);
+    expect([...s.element.children].map((c) => c.classList[0])).toEqual(["drawing__sheet", "replies"]);
+    expect([...s.element.firstElementChild!.children].map((c) => c.classList[0])).toEqual(["post", "pager"]);
+    expect([...sheet(s).children].map((c) => c.classList[0])).toEqual(["post__media", "post__text", "post__byline", "post__stat"]);
   });
 
   test("reply-notes: the drawing block holds the sheet and, after it, the replies", () => {
@@ -659,12 +660,14 @@ describe("pintado en dos fases (1.1)", () => {
     const s = shell();
     expect(s.element.matches("div.drawing")).toBe(true);
     s.fill(rootPost(), [{ reply, followups: [] }]);
-    expect(s.element.querySelector(":scope > .post + .replies")).not.toBeNull();
-    expect(s.element.querySelector(".post .replies")).toBeNull();
+    expect(s.element.querySelector(":scope > .drawing__sheet + .replies")).not.toBeNull();
+    expect(s.element.querySelector(".post .replies, .drawing__sheet .replies")).toBeNull();
+    expect(s.element.querySelector(".drawing__sheet > .post + .pager")).not.toBeNull();
+    expect(s.element.querySelector(".post .pager")).toBeNull();
 
     const empty = shell();
     empty.fill(rootPost(), []);
-    expect([...empty.element.children].map((c) => c.className)).toEqual(["post"]);
+    expect([...empty.element.children].map((c) => c.className)).toEqual(["drawing__sheet"]);
   });
 
   test("post del AppView sin imagen: se quita el hueco", () => {
@@ -676,13 +679,13 @@ describe("pintado en dos fases (1.1)", () => {
   test("con el hilo fallido se ven el texto, las flechas y el mensaje de error", () => {
     const s = shell();
     s.fail();
-    expect([...s.element.children].map((c) => c.className)).toEqual(["post"]);
+    expect([...s.element.children].map((c) => c.className)).toEqual(["drawing__sheet"]);
     expect(s.element.querySelector("figure")).toBeNull();
     expect(sheet(s).firstElementChild?.textContent).toBe("Não foi possível carregar este desenho.");
     expect(s.element.querySelector(".post__text")?.textContent).toBe("Prova de desenho");
     expect(s.element.querySelector(".post__byline strong")?.textContent).toBe("Naia");
-    expect(s.element.querySelector("nav a[rel=next]")).not.toBeNull();
-    expect(s.element.querySelector('nav a[href="#/indice"]')).not.toBeNull();
+    expect(s.element.querySelector("nav a[rel=prev]")).not.toBeNull(); // the arrows stay
+    expect(s.element.querySelector('nav a[href="#/indice"]')).toBeNull();
   });
 });
 
@@ -885,16 +888,20 @@ describe("clases BEM y estilos", () => {
 
   test("dibujo completo: bloques post y pager", async () => {
     const el = await fullDrawing();
-    for (const sel of [".post", ".post__media", ".post__zoom", ".post__image", ".post__text", ".post__byline", ".post__stat--likes", ".post__stat--shares", ".pager__link--prev", ".pager__link--index", ".pager__link--next"]) {
+    for (const sel of [".post", ".post__media", ".post__zoom", ".post__image", ".post__text", ".post__byline", ".post__stat--likes", ".post__stat--shares", ".pager__link--prev", ".pager__link--next"]) {
       expect(el.matches(sel) || el.querySelector(sel) !== null, sel).toBe(true);
     }
+    for (const a of el.querySelectorAll(".pager__link")) expect(a.querySelector(":scope > .pager__label"), a.className).not.toBeNull();
+    expect(el.querySelector(".post .pager")).toBeNull();
     expect(el.querySelector(".post__stat--likes")?.textContent).toBe("Fiz feliz a 3 amigas 🥰"); // los textos siguen en galego
   });
 
-  test("primer dibujo: sin pager__link--prev y con pager__link--index", () => {
-    const el = renderDrawing({ drawing: NAIA, post: rootPost(), neighbours: findDrawing(catalog, NAIA.rkey), cards: [], config: CONFIG, i18n, now: NOW });
+  test("primer dibujo (the newest): only pager__link--next, no pager__link--index", () => {
+    const leon = catalog.find((d) => d.rkey === LEON)!;
+    const el = renderDrawing({ drawing: leon, post: rootPost(), neighbours: findDrawing(catalog, LEON), cards: [], config: CONFIG, i18n, now: NOW });
     expect(el.querySelector(".pager__link--prev")).toBeNull();
-    expect(el.querySelector(".pager__link--index")).not.toBeNull();
+    expect(el.querySelector(".pager__link--next")).not.toBeNull();
+    expect(el.querySelector(".pager__link--index")).toBeNull();
   });
 
   test("tarjeta con seguimiento: replies__thread > reply + replies__followups > reply--followup", async () => {
@@ -1075,5 +1082,119 @@ describe("image viewer in the app (image-viewer 3.1, 3.2)", () => {
     const stopApp = startApp(document.createElement("main"), { config: CONFIG, fetchFn: server().fn, storage: null, now: () => NOW }).stop;
     expect(history.state).toBeNull();
     stopApp();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Site header (change page-navigation)
+// ---------------------------------------------------------------------------
+
+describe("site header (page-navigation 1.1)", () => {
+  let stop: (() => void) | undefined;
+  afterEach(() => {
+    stop?.();
+    location.hash = "";
+  });
+  function start(hash: string, fetchFn = server().fn) {
+    location.hash = hash;
+    const root = document.createElement("main");
+    const header = document.createElement("header");
+    header.className = "site-header";
+    const app = startApp(root, { config: CONFIG, fetchFn, storage: null, now: () => NOW, header });
+    stop = app.stop;
+    return { root, header, app };
+  }
+  const logo = (h: Element) => h.querySelector<HTMLAnchorElement>(".site-header__logo");
+  const index = (h: Element) => h.querySelector<HTMLAnchorElement>(".site-header__index");
+
+  test("Header on a drawing: caderno to the home, Todos os desenhos to the index", async () => {
+    const { header, app } = start(`#/d/${NAIA.rkey}`);
+    await app.render();
+    expect(logo(header)?.textContent).toBe("caderno");
+    expect(logo(header)?.getAttribute("href")).toBe("#/");
+    expect(index(header)?.textContent).toBe("Todos os desenhos");
+    expect(index(header)?.getAttribute("href")).toBe("#/indice");
+    expect(index(header)?.hasAttribute("aria-current")).toBe(false);
+    expect(header.textContent).toBe("caderno Todos os desenhos"); // reads without CSS
+    expect(badClasses(header)).toEqual([]);
+  });
+
+  test("Header on the index: aria-current only there, removed when leaving", async () => {
+    const { header, app } = start("#/indice");
+    await app.render();
+    expect(index(header)?.getAttribute("aria-current")).toBe("page");
+    expect(logo(header)?.hasAttribute("aria-current")).toBe(false);
+    location.hash = "#/";
+    await app.render();
+    expect(index(header)?.hasAttribute("aria-current")).toBe(false);
+  });
+
+  test("Header on a status message: there while loading and on errors", async () => {
+    const { header, app, root } = start("#/", server({ catalog: () => json({ error: "x" }, 500) }).fn);
+    const done = app.render();
+    expect(root.textContent).toBe("A carregar…");
+    expect(index(header)).not.toBeNull();
+    await done;
+    expect(root.textContent).toBe("Não foi possível carregar o caderno.");
+    expect(logo(header)).not.toBeNull();
+  });
+
+  test("Link from any page: drawing, index and not found", async () => {
+    for (const hash of [`#/d/${NAIA.rkey}`, "#/indice", "#/d/3mwso7oovnp2u"]) {
+      const { header, app } = start(hash);
+      await app.render();
+      expect(header.querySelectorAll('a[href="#/indice"]'), hash).toHaveLength(1);
+      stop?.();
+    }
+  });
+
+  test("without a header the app still works", async () => {
+    location.hash = "#/";
+    const root = document.createElement("main");
+    const app = startApp(root, { config: CONFIG, fetchFn: server().fn, storage: null, now: () => NOW });
+    stop = app.stop;
+    await app.render();
+    expect(root.querySelector(".post")).not.toBeNull();
+  });
+
+  test("index.html has the header before main", () => {
+    expect(indexHtml).toMatch(/<header class="site-header" id="site-header"><\/header>\s*<main id="app"/);
+  });
+});
+
+describe("pager in book order (page-navigation 2.1)", () => {
+  const newer: Drawing = { ...NAIA, rkey: "3newer" };
+  const older: Drawing = { ...NAIA, rkey: "3older" };
+  const pager = (neighbours: { older: Drawing | null; newer: Drawing | null }) =>
+    renderDrawingShell({ drawing: NAIA, neighbours: { ...neighbours, current: NAIA }, config: CONFIG, i18n, now: NOW }).element.querySelector("nav.pager")!;
+  const links = (nav: Element) => [...nav.querySelectorAll("a")].map((a) => [a.className, a.getAttribute("rel"), a.getAttribute("href"), a.textContent]);
+
+  test("Dibujo intermedio: previous at the left to the newer, next at the right to the older", () => {
+    expect(links(pager({ older, newer }))).toEqual([
+      ["pager__link pager__link--prev", "prev", "#/d/3newer", "Anterior"],
+      ["pager__link pager__link--next", "next", "#/d/3older", "Seguinte"],
+    ]);
+  });
+
+  test("Dibujo más reciente: only next, to the older", () => {
+    expect(links(pager({ older, newer: null }))).toEqual([["pager__link pager__link--next", "next", "#/d/3older", "Seguinte"]]);
+  });
+
+  test("Dibujo más antiguo: only previous, to the newer", () => {
+    expect(links(pager({ older: null, newer }))).toEqual([["pager__link pager__link--prev", "prev", "#/d/3newer", "Anterior"]]);
+  });
+
+  test("Names of the links: the label is the link's only content", () => {
+    const nav = pager({ older, newer });
+    expect(nav.getAttribute("aria-label")).toBe("Navegação entre desenhos");
+    for (const a of nav.querySelectorAll("a")) {
+      expect(a.children).toHaveLength(1);
+      expect(a.firstElementChild?.matches("span.pager__label")).toBe(true);
+    }
+    expect(nav.textContent).toBe("Anterior Seguinte"); // reads without CSS
+  });
+
+  test("the index page has no pager", () => {
+    expect(renderIndex(catalog, i18n, NOW).element.querySelector(".pager")).toBeNull();
   });
 });

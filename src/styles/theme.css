@@ -42,6 +42,7 @@
   /* Sombras */
   --shadow-sheet: -1px 7px 4px -5px rgb(0 0 0 / 0.3);
   --shadow-note: -1px 7px 4px -5px rgb(0 0 0 / 0.25);
+  --shadow-bar: 0 -2px 6px rgb(0 0 0 / 0.12); /* above the bottom bar of arrows */
 
   /* Tipografía. "Caderno Letra" es Andika (SIL, OFL) recortada: ver fonts.css. */
   --font-body: "Caderno Letra", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -83,6 +84,7 @@
 
   /* Medidas */
   --measure: 40rem;
+  --measure-full: calc(1600 / 16 * 1rem);
   --thumb-size: 6em;
   --viewer-gap: var(--space-4); /* space around the image in the viewer */
   --viewer-duration: 180ms; /* opening transition of the viewer */
@@ -104,4 +106,14 @@
   --note-overlap: 1.25rem; /* 20 px over the note before; must stay below --note-padding-block (tested) */
   --note-tilt: 1deg;
   --note-shift: min(1.5rem, 4vw); /* zigzag offset */
+
+  /*
+   * Arrows of the pager (pager.css). The breakpoint where they move beside
+   * the sheet is written in pager.css from these tokens and --sheet-width;
+   * a test recomputes it.
+   */
+  --pager-arrow-size: 3rem; /* 48 px: side of each arrow's touch target, at least 44 px */
+  --pager-gap: var(--space-4); /* between the sheet and each arrow */
+  --pager-lift: var(--space-10); /* from the bottom of the sheet to the bottom of the arrows */
+  --pager-bar-padding: var(--space-2); /* around the arrows in the bottom bar */
 }

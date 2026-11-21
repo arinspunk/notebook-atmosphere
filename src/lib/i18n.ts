@@ -26,6 +26,8 @@ const GL = {
   // Contadores
   likes: { one: "Fiz feliz a {n} amiga 🥰", other: "Fiz feliz a {n} amigas 🥰" } as PluralForms,
   shared: { one: "Partilhado {n} vez", other: "Partilhado {n} vezes" } as PluralForms,
+  /** Name of the notebook, in the header until there is a logo. */
+  siteName: "caderno",
   // Navegación
   /** Nombre accesible de la navegación entre desenhos. */
   navLabel: "Navegação entre desenhos",

@@ -211,7 +211,7 @@ describe("sticky notes (reply-notes)", () => {
 describe("colores en los componentes", () => {
   test("los componentes no usan colores literales; el comprobador los detecta", () => {
     const files = readCssDir("src/styles/components");
-    expect(Object.keys(files).length).toBe(10);
+    expect(Object.keys(files).length).toBe(11);
     for (const [f, css] of Object.entries(files)) {
       expect(css.trim(), f).not.toBe(""); // si la lectura falla, el test no puede pasar en vacío
       expect(literalColors(css), f).toEqual([]);
@@ -239,5 +239,38 @@ describe("viewer opening transition (image-viewer 4.2)", () => {
     const start = viewerCss.search(/@media\s*\(prefers-reduced-motion:\s*reduce\)/);
     expect(start).toBeGreaterThan(-1);
     expect(viewerCss.slice(start)).toMatch(/transition:\s*none/);
+  });
+});
+
+describe("pager breakpoint (page-navigation 3.2)", () => {
+  const rem = (props: Map<string, string>, name: string) => {
+    const v = resolveToken(props, name);
+    const m = /^([\d.]+)rem$/.exec(v);
+    if (!m) throw new Error(`--${name} is not in rem: ${v}`);
+    return Number(m[1]);
+  };
+  /** Width where the sheet, both arrows with their gaps and the page gutters fit. */
+  const expected = (theme: string) => {
+    const p = cssCustomProperties(theme);
+    return rem(p, "sheet-width") + 2 * (rem(p, "pager-arrow-size") + rem(p, "pager-gap")) + 2 * rem(p, "space-4");
+  };
+  const breakpoints = (css: string) => [...css.replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/@media\s*\(\s*width\s*>=\s*([\d.]+)rem\s*\)/g)].map((m) => Number(m[1]));
+
+  test("pager.css and drawing.css use the breakpoint the tokens give", () => {
+    expect(expected(themeCss)).toBe(39.25);
+    for (const file of ["src/styles/components/pager.css", "src/styles/components/drawing.css"]) {
+      const found = breakpoints(readProjectFile(file));
+      expect(found, file).toEqual([expected(themeCss)]);
+    }
+  });
+
+  test("a bigger arrow changes the expected breakpoint, so the check would fail", () => {
+    const bigger = themeCss.replace(/--pager-arrow-size:\s*3rem/, "--pager-arrow-size: 4rem");
+    expect(bigger).not.toBe(themeCss);
+    expect(expected(bigger)).not.toBe(breakpoints(readProjectFile("src/styles/components/pager.css"))[0]);
+  });
+
+  test("each arrow is a touch target of at least 44 px", () => {
+    expect(rem(cssCustomProperties(themeCss), "pager-arrow-size") * 16).toBeGreaterThanOrEqual(44);
   });
 });

@@ -14,7 +14,7 @@ import { firstImage, pageImageUrl, recordAspectRatio, recordHasImage, validAspec
 import type { I18n } from "../lib/i18n.ts";
 import { cleanCadernoSegments, facetSegments } from "../lib/text.ts";
 import type { PostView } from "../lib/types.ts";
-import { drawingHref, INDEX_HREF } from "../router.ts";
+import { drawingHref } from "../router.ts";
 import { el, renderByline, renderSegments } from "./dom.ts";
 import { openViewer } from "./viewer.ts";
 
@@ -60,16 +60,15 @@ function renderImage(post: PostView, i18n: I18n): HTMLButtonElement | null {
   return button;
 }
 
+/**
+ * The arrows, in book order (page-navigation, decision 2): the newest drawing
+ * comes first, so "next" goes to the older one, at the right, and "previous"
+ * to the newer one, at the left. The labels are real text, hidden by CSS.
+ */
 function renderNav(n: Neighbours, i18n: I18n): HTMLElement {
-  return el(
-    "nav",
-    { class: "pager", "aria-label": i18n.t("navLabel") },
-    n.older && el("a", { class: "pager__link pager__link--prev", href: drawingHref(n.older.rkey), rel: "prev" }, i18n.t("previous")),
-    " ",
-    el("a", { class: "pager__link pager__link--index", href: INDEX_HREF }, i18n.t("index")),
-    " ",
-    n.newer && el("a", { class: "pager__link pager__link--next", href: drawingHref(n.newer.rkey), rel: "next" }, i18n.t("next")),
-  );
+  const link = (to: Drawing | null, dir: "prev" | "next", label: "previous" | "next") =>
+    to && el("a", { class: `pager__link pager__link--${dir}`, href: drawingHref(to.rkey), rel: dir }, el("span", { class: "pager__label" }, i18n.t(label)));
+  return el("nav", { class: "pager", "aria-label": i18n.t("navLabel") }, link(n.newer, "prev", "previous"), " ", link(n.older, "next", "next"));
 }
 
 /** Una respuesta: nombre, fecha y texto. Sin avatar, imágenes, embeds ni contadores. */
@@ -121,7 +120,7 @@ export interface DrawingShellInput {
 }
 
 export interface DrawingShell {
-  /** The `drawing` block: the sheet (`post`) and, after it, the replies. */
+  /** The `drawing` block: the sheet (`post` and its arrows) and, after it, the replies. */
   element: HTMLElement;
   /** Coloca la imagen en su hueco, los contadores y las tarjetas. */
   fill(post: PostView, cards: Card[]): void;
@@ -138,7 +137,7 @@ export function renderDrawingShell({ drawing, neighbours, config, i18n, now }: D
   const recordRatio = recordAspectRatio(drawing.record);
   if (figure && recordRatio) setRatio(figure, recordRatio);
   const nav = renderNav(neighbours, i18n);
-  const post = el(
+  const sheet = el(
     "article",
     { class: "post" },
     figure,
@@ -151,16 +150,17 @@ export function renderDrawingShell({ drawing, neighbours, config, i18n, now }: D
       i18n,
       now,
     }),
-    nav,
   );
-  // The replies go after the sheet, outside it (reply-notes, decision 1).
-  const element = el("div", { class: "drawing" }, post);
+  // The arrows go beside the sheet, outside it, so the rotation of `post` does
+  // not trap the fixed bar (page-navigation, decision 2); the replies go after
+  // the sheet (reply-notes, decision 1).
+  const element = el("div", { class: "drawing" }, el("div", { class: "drawing__sheet" }, sheet, nav));
 
   /** Sustituye el hueco por `node` (o lo quita si es `null`). */
   const replaceFigure = (node: HTMLElement | null) => {
     if (figure && node) figure.replaceWith(node);
     else if (figure) figure.remove();
-    else if (node) post.prepend(node);
+    else if (node) sheet.prepend(node);
     figure = node;
   };
 
@@ -175,7 +175,7 @@ export function renderDrawingShell({ drawing, neighbours, config, i18n, now }: D
       if (img && figure && !recordRatio && appviewRatio) setRatio(figure, appviewRatio);
       const likes = count(post.likeCount);
       const shared = count(post.repostCount) + count(post.quoteCount);
-      nav.before(
+      sheet.append(
         ...[
           likes ? el("p", { class: "post__stat post__stat--likes" }, i18n.tn("likes", likes)) : null,
           shared ? el("p", { class: "post__stat post__stat--shares" }, i18n.tn("shared", shared)) : null,

@@ -1,8 +1,78 @@
-/* Bloque `pager`: anterior, índice y siguiente. */
+/*
+ * Block `pager`: the arrows to the previous (newer) and next (older) drawing.
+ * Each link shows only its image; its text is a label hidden from sight, so
+ * screen readers name it and the page still reads without CSS.
+ *
+ * Mobile first: a bar fixed at the bottom of the screen. From the width where
+ * the sheet and both arrows fit side by side, beside the sheet, towards its
+ * bottom. The images are files of their own, replaceable without touching code.
+ */
 
 .pager {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 1; /* above the rotated notes */
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-4);
-  margin-block: var(--space-5);
+  align-items: center;
+  padding-block: var(--pager-bar-padding) calc(var(--pager-bar-padding) + env(safe-area-inset-bottom));
+  padding-inline: max(var(--pager-bar-padding), env(safe-area-inset-left)) max(var(--pager-bar-padding), env(safe-area-inset-right));
+  background: var(--color-bg);
+  box-shadow: var(--shadow-bar);
+}
+
+.pager__link {
+  display: block;
+  flex: none;
+  inline-size: var(--pager-arrow-size);
+  block-size: var(--pager-arrow-size);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+/* At the left of the sheet, pointing right, towards it. */
+.pager__link--prev {
+  background-image: url("../../assets/images/arrow-prev.svg");
+}
+
+/* At the right of the sheet, pointing left, towards it; at the right even alone. */
+.pager__link--next {
+  margin-inline-start: auto;
+  background-image: url("../../assets/images/arrow-next.svg");
+}
+
+/* Visually hidden: still the link's accessible name. */
+.pager__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/*
+ * Beside the sheet. 39.25rem = --sheet-width + 2 × (--pager-arrow-size +
+ * --pager-gap) + 2 × --space-4 (the page gutters); custom properties cannot
+ * go in a media query, so a test checks this number against the tokens.
+ */
+@media (width >= 39.25rem) {
+  .pager {
+    position: absolute;
+    inset-inline: auto;
+    inset-block-end: var(--pager-lift);
+    left: 50%;
+    z-index: auto;
+    width: calc(var(--sheet-width) + 2 * (var(--pager-arrow-size) + var(--pager-gap)));
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    translate: -50% 0;
+    pointer-events: none; /* the box spans the sheet: only the arrows take clicks */
+  }
+
+  .pager__link {
+    pointer-events: auto;
+  }
 }
