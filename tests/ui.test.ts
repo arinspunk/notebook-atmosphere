@@ -22,6 +22,7 @@ import { json, mockFetch } from "./helpers.ts";
 import type { FetchFn } from "../src/xrpc.ts";
 import { closeViewer, isViewerState } from "../src/ui/viewer.ts";
 import { fakeImages, installDialogShim, nextPopState } from "./dialog-shim.ts";
+import { fakeMatchMedia, fakeViewTransitions } from "./view-transitions.ts";
 
 installDialogShim();
 
@@ -170,10 +171,17 @@ function slowServer(over: Parameters<typeof server>[0] = {}) {
   return { fn, calls, state, release };
 }
 
-/** Ventana simulada: `go` cambia el hash y avisa a la app al momento (sin los `hashchange` asíncronos de jsdom). */
-function fakeWindow(hash = "#/") {
-  const doc = Object.assign(new EventTarget(), { visibilityState: "visible" as DocumentVisibilityState });
-  const win = Object.assign(new EventTarget(), { location: { hash }, document: doc, scrollTo: () => {} });
+/**
+ * Ventana simulada: `go` cambia el hash y avisa a la app al momento (sin los `hashchange` asíncronos de jsdom).
+ * With `turns`, its document has a fake `startViewTransition` and a `<html>` (page-turn-transition).
+ */
+function fakeWindow(hash = "#/", { turns, reducedMotion = false }: { turns?: ReturnType<typeof fakeViewTransitions>; reducedMotion?: boolean } = {}) {
+  const doc = Object.assign(
+    new EventTarget(),
+    { visibilityState: "visible" as DocumentVisibilityState },
+    turns ? { documentElement: document.createElement("html"), startViewTransition: turns.startViewTransition } : {},
+  );
+  const win = Object.assign(new EventTarget(), { location: { hash }, document: doc, scrollTo: () => {}, matchMedia: fakeMatchMedia(reducedMotion) });
   return {
     win: win as unknown as Window,
     doc,
@@ -247,15 +255,16 @@ describe("navegar entre dibujos (1.2)", () => {
   });
 });
 
+const VELLO = "3n2aaaaaaaaaa";
+/** Catálogo con un tercer dibujo, más antiguo que Naia: Naia queda en medio. */
+const threeDrawings = () => {
+  const posts = structuredClone(pdsPosts) as { records: RepoRecord<PostRecord>[] };
+  const naia = posts.records.find((r) => r.uri.endsWith(NAIA.rkey))!;
+  posts.records.push({ ...structuredClone(naia), uri: naia.uri.replace(NAIA.rkey, VELLO), value: { ...naia.value, createdAt: "2026-01-01T00:00:00Z" } });
+  return json(posts);
+};
+
 describe("precarga de vecinos (2.2)", () => {
-  const VELLO = "3n2aaaaaaaaaa";
-  /** Catálogo con un tercer dibujo, más antiguo que Naia: Naia queda en medio. */
-  const threeDrawings = () => {
-    const posts = structuredClone(pdsPosts) as { records: RepoRecord<PostRecord>[] };
-    const naia = posts.records.find((r) => r.uri.endsWith(NAIA.rkey))!;
-    posts.records.push({ ...structuredClone(naia), uri: naia.uri.replace(NAIA.rkey, VELLO), value: { ...naia.value, createdAt: "2026-01-01T00:00:00Z" } });
-    return json(posts);
-  };
   let stop: (() => void) | undefined;
   afterEach(() => stop?.());
 
@@ -434,6 +443,125 @@ describe("vuelta del segundo plano (3.1)", () => {
     await vi.waitFor(() => expect(t.root.querySelector("figure img")).not.toBeNull());
     await new Promise((r) => setTimeout(r, 10));
     expect([t.catalogCalls(), t.threadCalls()]).toEqual([2, 2]);
+  });
+});
+
+describe("page turn between drawings (page-turn-transition 2.2)", () => {
+  let stop: (() => void) | undefined;
+  afterEach(() => stop?.());
+
+  /** Which of the three drawings is on the page, from its arrows (Vello has Naia's name). */
+  const onPage = (root: Element) => {
+    if (!root.querySelector(".post")) return null;
+    if (!root.querySelector("a[rel=prev]")) return LEON;
+    if (!root.querySelector("a[rel=next]")) return VELLO;
+    return NAIA.rkey;
+  };
+
+  async function start(hash: string, { reducedMotion = false, slowRkey }: { reducedMotion?: boolean; slowRkey?: string } = {}) {
+    const srv = slowServer({ catalog: threeDrawings });
+    if (slowRkey) Object.assign(srv.state, { slow: true, only: slowRkey });
+    const root = document.createElement("main");
+    const turns = fakeViewTransitions({ autoFinish: true, probe: () => ({ page: root.firstElementChild, image: !!root.querySelector(".post__image") }) });
+    const clock = { t: NOW };
+    const preloaded: string[] = [];
+    const w = fakeWindow(hash, { turns, reducedMotion });
+    const app = startApp(root, { config: CONFIG, fetchFn: srv.fn, storage: null, now: () => clock.t, preloadImage: (src) => preloaded.push(src) }, w.win);
+    stop = app.stop;
+    await app.render();
+    const html = (w.doc as unknown as Document).documentElement;
+    const settle = () => new Promise((r) => setTimeout(r, 10));
+    /** Goes to `next` and waits for its turn's update, if there is one. */
+    const go = async (next: string) => {
+      const n = turns.started.length;
+      w.go(next);
+      if (turns.started.length > n) await turns.started.at(-1)!.updateDone;
+      await settle();
+    };
+    const visibility = (v: DocumentVisibilityState) => {
+      w.doc.visibilityState = v;
+      w.doc.dispatchEvent(new Event("visibilitychange"));
+    };
+    return { srv, root, turns, html, clock, preloaded, go, goNow: w.go, settle, visibility };
+  }
+
+  test("to older and newer drawings, by catalogue order: arrows, back action and the home", async () => {
+    const t = await start(`#/d/${NAIA.rkey}`);
+    expect(t.turns.started).toHaveLength(0); // first page
+    await vi.waitFor(() => expect(t.preloaded).toHaveLength(2));
+    await t.go(`#/d/${VELLO}`); // "Seguinte"
+    await t.go(`#/d/${NAIA.rkey}`); // the browser's back action
+    await t.go(`#/d/${VELLO}`);
+    await t.go("#/"); // the home, two drawings newer
+    expect(t.turns.started.map((x) => x.directionAtUpdate)).toEqual(["older", "newer", "older", "newer"]);
+    expect(onPage(t.root)).toBe(LEON);
+    expect(t.html.dataset.pageTurn).toBeUndefined(); // cleared once finished
+  });
+
+  test("neighbour prepared: the new sheet already has its image, and its neighbours are prepared afterwards", async () => {
+    const t = await start("#/");
+    await vi.waitFor(() => expect(t.preloaded).toHaveLength(1)); // Naia, Leon's only neighbour
+    await t.go(`#/d/${NAIA.rkey}`);
+    const [turn] = t.turns.started;
+    expect(turn!.probed).toEqual({ page: t.root.firstElementChild, image: true });
+    expect(onPage(t.root)).toBe(NAIA.rkey);
+    await vi.waitFor(() => expect(t.preloaded).toHaveLength(3)); // + Leon and Vello
+  });
+
+  test("neighbour not ready: the turn shows the shell without waiting, and the image comes later", async () => {
+    const t = await start("#/", { slowRkey: NAIA.rkey });
+    await t.go(`#/d/${NAIA.rkey}`);
+    const [turn] = t.turns.started;
+    expect(turn!.probed).toEqual({ page: t.root.firstElementChild, image: false });
+    expect(onPage(t.root)).toBe(NAIA.rkey);
+    expect(t.root.querySelector(".post__text")?.textContent).toBe("Prova de desenho");
+    await t.srv.release(NAIA.rkey);
+    await vi.waitFor(() => expect(t.root.querySelector(".post__image")).not.toBeNull());
+  });
+
+  test("no turn from the index, or with reduced motion", async () => {
+    const fromIndex = await start("#/indice");
+    await fromIndex.go(`#/d/${NAIA.rkey}`);
+    expect(onPage(fromIndex.root)).toBe(NAIA.rkey);
+    expect(fromIndex.turns.started).toHaveLength(0);
+    stop?.();
+
+    const reduced = await start(`#/d/${NAIA.rkey}`, { reducedMotion: true });
+    await reduced.go(`#/d/${VELLO}`);
+    expect(onPage(reduced.root)).toBe(VELLO);
+    expect(reduced.turns.started).toHaveLength(0);
+    expect(reduced.html.dataset.pageTurn).toBeUndefined();
+  });
+
+  test("back twice during a turn: the first is skipped, its stale update shows nothing, and the page ends on the last hash", async () => {
+    const t = await start("#/");
+    await t.go(`#/d/${NAIA.rkey}`);
+    await t.go(`#/d/${VELLO}`);
+    const vello = t.root.firstElementChild;
+    const n = t.turns.started.length;
+    t.goNow(`#/d/${NAIA.rkey}`);
+    t.goNow("#/");
+    const [first, second] = t.turns.started.slice(n);
+    expect(first!.skipped).toBe(true);
+    await first!.updateDone;
+    expect((first!.probed as { page: Element }).page).toBe(vello); // the stale update showed nothing
+    await second!.updateDone;
+    await t.settle();
+    expect(second!.directionAtUpdate).toBe("newer");
+    expect(onPage(t.root)).toBe(LEON);
+    expect(t.html.dataset.pageTurn).toBeUndefined();
+  });
+
+  test("after the background reload, the same drawing comes back without a turn", async () => {
+    const t = await start(`#/d/${NAIA.rkey}`);
+    await t.settle();
+    t.visibility("hidden");
+    t.clock.t += 11 * 60_000;
+    t.visibility("visible");
+    expect(t.root.textContent).toBe("A carregar…");
+    await vi.waitFor(() => expect(t.root.querySelector(".post__image")).not.toBeNull());
+    expect(onPage(t.root)).toBe(NAIA.rkey);
+    expect(t.turns.started).toHaveLength(0);
   });
 });
 

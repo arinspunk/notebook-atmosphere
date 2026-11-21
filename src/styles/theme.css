@@ -88,6 +88,8 @@
   --thumb-size: 6em;
   --viewer-gap: var(--space-4); /* space around the image in the viewer */
   --viewer-duration: 180ms; /* opening transition of the viewer */
+  --page-turn-duration: 550ms; /* the sheet turning between drawings (page-turn.css) */
+  --page-turn-notes-duration: 200ms; /* each fade of the notes, before and after the turn */
 
   /* Hoja del dibujo */
   --sheet-width: 29.25rem; /* 468 px */

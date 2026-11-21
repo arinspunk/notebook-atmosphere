@@ -14,10 +14,10 @@ Moving from one drawing to another swaps the whole page at once. The site looks 
 - **What stays still:** the site header and the arrows (beside the sheet, or in the bottom bar on a phone) do not take part in the turn.
 - **The new sheet arrives complete when it can:** if the drawing was prepared in advance, the sheet that is uncovered already shows its image. Otherwise the turn starts at once with what the catalogue has, as today, and the rest appears when it arrives.
 - **No turn** on the first load, on links to a drawing from outside, between the index and a drawing, when the same drawing is shown again, when the visitor's system asks for reduced motion, or in browsers without the View Transitions API. In all those cases the page changes at once, as today.
-- **Quick clicks:** a new navigation during a turn ends the current turn at once and goes on to the new drawing.
+- **Quick navigation:** a new navigation during a turn (for example, the browser's back action) ends the current turn at once and goes on to the new drawing. Clicks on the page during the turn do not navigate, so a double click on an arrow moves one drawing, not two.
 - The duration comes from the design tokens.
 
-Out of scope: an entrance animation of the notes ("sticking" with a bounce), a transition from an index thumbnail to the sheet, showing the back of the turning sheet, and swipe gestures.
+Out of scope: an entrance animation of the notes ("sticking" with a bounce), a transition from an index thumbnail to the sheet, a drawn back of the sheet (it is blank paper), and swipe gestures.
 
 ## Capabilities
 
@@ -33,8 +33,8 @@ None.
 
 ## Impact
 
-- **Code:** `src/app.ts` (direction, and wrapping the swap in a view transition), a small module for the direction and the transition (`src/ui/page-turn.ts`), `src/drawing-loader.ts` (`peek` of a settled result, so the new sheet can be filled before the snapshot).
+- **Code:** `src/app.ts` (direction, building the shell before the transition, and wrapping the swap in a view transition) and a small module for the direction and the transition (`src/ui/page-turn.ts`). `src/drawing-loader.ts` does not change.
 - **Styles:** a new `components/page-turn.css` (the view-transition pseudo-elements and reduced motion), `view-transition-name`s for the sheet, the notes, the header and the pager, and a `--page-turn-duration` token in `theme.css`.
-- **Tests:** direction, the transition being used or not (with a fake `startViewTransition`, since jsdom has none), skipping on quick clicks, the attribute removed afterwards, and the style tests (tokens, reduced motion, no literal colours).
+- **Tests:** direction, the transition being used or not (with a fake `startViewTransition`, since jsdom has none), skipping on quick navigation, the attribute removed afterwards but never during a newer turn, and the style tests (tokens, reduced motion, no literal colours).
 - **No changes:** data, moderation, freshness, routes, CSP (no new resource, and the transition is styled only from the site's own stylesheet).
-- **Depends on** `page-navigation` (sheet and arrows as separate elements), which is implemented but not yet archived.
+- **Builds on** `page-navigation` (sheet and arrows as separate elements), already archived.

@@ -1,0 +1,153 @@
+/*
+ * Page turn between drawings (page-turn-transition, decision 3). Not a block
+ * of its own: it names existing blocks for a view transition and animates the
+ * transition's pseudo-elements. `src/ui/page-turn.ts` sets `data-page-turn`
+ * on <html> only while a turn runs, so the names exist only then.
+ *
+ * - The sheet turns around the axis of its rings. Towards an older drawing,
+ *   the old sheet turns away on top, showing its blank back past edge-on,
+ *   and uncovers the new one; towards a newer one, the new sheet comes back
+ *   from edge-on (-90deg) and lands on top of the old one.
+ * - The notes never turn: the old ones fade out as the turn starts, and the
+ *   new ones fade in once the sheet has landed.
+ * - The header and the arrows are named so they stay out of the page's
+ *   cross-fade; the arrows jump at once to their new place, like the sheet.
+ */
+
+:root[data-page-turn] .post {
+  view-transition-name: sheet;
+}
+
+:root[data-page-turn] .replies {
+  view-transition-name: notes;
+}
+
+:root[data-page-turn] .site-header {
+  view-transition-name: site-header;
+}
+
+:root[data-page-turn] .pager {
+  view-transition-name: pager;
+}
+
+/*
+ * The groups stay at the new position and size from the first frame: the two
+ * sheets never stretch to each other's height, and neither the old sheet nor
+ * the arrows slide in from above the screen when the page was scrolled down.
+ */
+:root[data-page-turn]::view-transition-group(sheet),
+:root[data-page-turn]::view-transition-group(notes),
+:root[data-page-turn]::view-transition-group(pager) {
+  animation: none;
+}
+
+:root[data-page-turn]::view-transition-image-pair(sheet) {
+  perspective: 100rem; /* far enough for a gentle turn on a sheet of --sheet-width */
+}
+
+/*
+ * Past edge-on the sheet's free edge comes towards the visitor, so the turn
+ * to an older drawing looks from further away, or the back grows too large.
+ */
+:root[data-page-turn="older"]::view-transition-image-pair(sheet) {
+  perspective: 200rem;
+}
+
+/* The sheet that does not turn stays still and opaque: no default cross-fade. */
+:root[data-page-turn]::view-transition-old(sheet),
+:root[data-page-turn]::view-transition-new(sheet) {
+  transform-origin: calc(var(--sheet-rings) / 2) 50%;
+  mix-blend-mode: normal;
+  animation: none;
+}
+
+:root[data-page-turn="older"]::view-transition-old(sheet) {
+  z-index: 1;
+  animation: page-turn-away var(--page-turn-duration) linear both; /* easing per keyframe */
+}
+
+:root[data-page-turn="newer"]::view-transition-new(sheet) {
+  z-index: 1;
+  animation: page-turn-back var(--page-turn-duration) ease-out both;
+}
+
+/*
+ * Towards an older drawing the sheet goes all the way over the rings: its
+ * front darkens a little up to edge-on (-90deg), then its back, blank paper,
+ * goes on to the other side and fades out. The back is the same snapshot
+ * turned white: `brightness(0) invert()` paints every opaque pixel white and
+ * keeps the ring holes transparent. Fastest when edge-on, so the switch from
+ * front to back is not seen.
+ */
+@keyframes page-turn-away {
+  0% {
+    transform: rotateY(0);
+    filter: brightness(1) invert(0);
+    animation-timing-function: ease-in;
+  }
+
+  50% {
+    transform: rotateY(-90deg);
+    filter: brightness(0.85) invert(0);
+    animation-timing-function: ease-out;
+  }
+
+  50.1% {
+    filter: brightness(0) invert(0.96);
+  }
+
+  65% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: rotateY(-180deg);
+    filter: brightness(0) invert(0.96);
+    opacity: 0;
+  }
+}
+
+@keyframes page-turn-back {
+  from {
+    transform: rotateY(-90deg);
+    filter: brightness(0.85);
+  }
+}
+
+:root[data-page-turn]::view-transition-old(notes),
+:root[data-page-turn]::view-transition-new(notes) {
+  mix-blend-mode: normal;
+}
+
+:root[data-page-turn]::view-transition-old(notes) {
+  animation: page-turn-fade-out var(--page-turn-notes-duration) ease-out both;
+}
+
+:root[data-page-turn]::view-transition-new(notes) {
+  animation: page-turn-fade-in var(--page-turn-notes-duration) ease-in var(--page-turn-duration) both;
+}
+
+@keyframes page-turn-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes page-turn-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/*
+ * The app starts no turn when the system asks for reduced motion; this is the
+ * backstop, should the preference change during one (decision 5).
+ */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-page-turn="older"]::view-transition-old(sheet),
+  :root[data-page-turn="newer"]::view-transition-new(sheet),
+  :root[data-page-turn]::view-transition-old(notes),
+  :root[data-page-turn]::view-transition-new(notes) {
+    animation: none;
+  }
+}

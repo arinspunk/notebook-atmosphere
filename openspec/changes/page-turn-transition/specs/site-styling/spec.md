@@ -25,7 +25,7 @@ Going from one drawing to another SHALL turn the sheet around the axis of its ri
 During the page turn, the sticky notes SHALL NOT turn with the sheet: the old drawing's notes SHALL fade out as the turn starts and the new drawing's notes SHALL fade in after it ends. The site header and the arrows SHALL stay in place, without turning or fading as a whole.
 
 #### Scenario: Both drawings have replies
-- **WHEN** the sheet turns from a drawing with notes to another drawing with notes
+- **WHEN** the sheet turns from a drawing with notes to another drawing with notes that was prepared in advance
 - **THEN** the old notes are gone before the new sheet is fully shown, the new notes appear after it, and no note rotates with the sheet
 
 #### Scenario: Arrows in the bottom bar
@@ -36,7 +36,7 @@ During the page turn, the sticky notes SHALL NOT turn with the sheet: the old dr
 When the drawing being turned to was prepared in advance, the uncovered sheet SHALL already show its image. Otherwise the turn SHALL start without waiting for the network, with the text, name, date and the reserved image slot from the catalogue, and the rest SHALL appear when it arrives.
 
 #### Scenario: Neighbour prepared
-- **WHEN** the visitor activates an arrow whose drawing finished preparing less than 60 seconds ago
+- **WHEN** the visitor activates an arrow whose drawing has finished preparing, with the preparation started less than 60 seconds ago
 - **THEN** the sheet that is uncovered or lands shows the drawing's image during the turn
 
 #### Scenario: Neighbour not ready
@@ -63,8 +63,12 @@ The page SHALL change at once, with no page turn, when the system asks for reduc
 - **THEN** the new drawing is shown at once, as before this change
 
 ### Requirement: Quick navigation during a page turn
-A new navigation during a page turn SHALL end that turn at once and SHALL show the drawing of the latest navigation. A page turn SHALL never leave the page showing a drawing other than the latest one requested.
+A new navigation during a page turn SHALL end that turn at once and SHALL show the drawing of the latest navigation. A page turn SHALL never leave the page showing a drawing other than the latest one requested. Clicks on the page during a turn SHALL NOT navigate, so a double click on an arrow moves one drawing.
 
-#### Scenario: Two quick clicks
-- **WHEN** the visitor activates "Seguinte" twice before the first turn ends
-- **THEN** the first turn ends at once, and the page ends showing the drawing two places older
+#### Scenario: Back twice during a turn
+- **WHEN** the visitor went two drawings older with "Seguinte" and then uses the browser's back action twice before the first turn back ends
+- **THEN** the first turn ends at once, and the page ends showing the drawing the visitor started from
+
+#### Scenario: Double click on an arrow
+- **WHEN** the visitor double-clicks the "Seguinte" arrow
+- **THEN** the page turns once and ends showing the next older drawing

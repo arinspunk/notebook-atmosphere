@@ -211,7 +211,7 @@ describe("sticky notes (reply-notes)", () => {
 describe("colores en los componentes", () => {
   test("los componentes no usan colores literales; el comprobador los detecta", () => {
     const files = readCssDir("src/styles/components");
-    expect(Object.keys(files).length).toBe(11);
+    expect(Object.keys(files).length).toBe(12);
     for (const [f, css] of Object.entries(files)) {
       expect(css.trim(), f).not.toBe(""); // si la lectura falla, el test no puede pasar en vacío
       expect(literalColors(css), f).toEqual([]);
@@ -239,6 +239,39 @@ describe("viewer opening transition (image-viewer 4.2)", () => {
     const start = viewerCss.search(/@media\s*\(prefers-reduced-motion:\s*reduce\)/);
     expect(start).toBeGreaterThan(-1);
     expect(viewerCss.slice(start)).toMatch(/transition:\s*none/);
+  });
+});
+
+describe("page turn (page-turn-transition 3.1)", () => {
+  const pageTurnCss = readProjectFile("src/styles/components/page-turn.css").replace(/\/\*[\s\S]*?\*\//g, "");
+  const TOKENS = ["page-turn-duration", "page-turn-notes-duration"];
+
+  test("every animation uses the tokens, and they resolve to times", () => {
+    expect(pageTurnCss.trim()).not.toBe("");
+    const animations = [...pageTurnCss.matchAll(/animation:\s*([^;]+);/g)].map((m) => m[1]!.trim());
+    const animated = animations.filter((a) => a !== "none");
+    expect(animated.length).toBe(4); // sheet away, sheet back, notes out, notes in
+    for (const a of animated) expect(TOKENS.some((t) => a.includes(`var(--${t})`)), a).toBe(true);
+    // The new notes wait for the sheet to land.
+    expect(animated).toContainEqual(expect.stringMatching(/var\(--page-turn-notes-duration\).*var\(--page-turn-duration\)/));
+    const props = cssCustomProperties(themeCss);
+    for (const t of TOKENS) expect(resolveToken(props, t), t).toMatch(/^\d+m?s$/);
+  });
+
+  test("the names exist only during a turn", () => {
+    const named = [...pageTurnCss.matchAll(/([^{}]+)\{\s*view-transition-name:\s*([\w-]+)/g)].map((m) => [m[1]!.trim(), m[2]]);
+    expect(named.map(([, name]) => name)).toEqual(["sheet", "notes", "site-header", "pager"]);
+    for (const [selector] of named) expect(selector).toMatch(/^:root\[data-page-turn\] /);
+  });
+
+  test("with reduced motion there is no animation", () => {
+    const start = pageTurnCss.search(/@media\s*\(prefers-reduced-motion:\s*reduce\)/);
+    expect(start).toBeGreaterThan(-1);
+    const block = pageTurnCss.slice(start);
+    expect(block).toMatch(/animation:\s*none/);
+    for (const part of ['[data-page-turn="older"]::view-transition-old(sheet)', '[data-page-turn="newer"]::view-transition-new(sheet)', "::view-transition-old(notes)", "::view-transition-new(notes)"]) {
+      expect(block, part).toContain(part);
+    }
   });
 });
 

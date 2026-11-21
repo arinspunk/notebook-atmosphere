@@ -20,6 +20,8 @@
 
 .site-header__logo,
 .site-header__index {
+  font-family: var(--font-heading);
+  line-height: var(--line-height-tight);
   color: var(--color-ink);
   text-decoration: none;
 }
@@ -29,11 +31,6 @@
 .site-header__index:hover,
 .site-header__index:focus-visible {
   text-decoration: underline;
-}
-
-.site-header__logo {
-  font-family: var(--font-heading);
-  line-height: var(--line-height-tight);
 }
 
 /* On the index, the link is the current page. */

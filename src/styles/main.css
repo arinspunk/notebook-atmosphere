@@ -26,3 +26,4 @@
 @import "./components/post-card.css" layer(components);
 @import "./components/status.css" layer(components);
 @import "./components/viewer.css" layer(components);
+@import "./components/page-turn.css" layer(components);

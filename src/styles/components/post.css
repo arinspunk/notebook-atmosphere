@@ -13,7 +13,6 @@
   display: flex;
   flex-direction: column;
   max-width: var(--sheet-width);
-  min-width: var(--sheet-width);
   min-height: var(--sheet-height);
   margin-inline: auto;
   padding: var(--sheet-padding);

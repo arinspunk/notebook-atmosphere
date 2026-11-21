@@ -22,6 +22,7 @@ import { el } from "./ui/dom.ts";
 import { renderDrawingShell } from "./ui/drawing-view.ts";
 import { markCurrent, renderHeader } from "./ui/header.ts";
 import { loadThumbnails, renderIndex } from "./ui/index-view.ts";
+import { imageDecoded, startPageTurn, turnDirection, type PageTurn } from "./ui/page-turn.ts";
 import { closeViewer, isViewerState } from "./ui/viewer.ts";
 import type { FetchFn } from "./xrpc.ts";
 
@@ -67,6 +68,10 @@ export function startApp(root: HTMLElement, deps: AppDeps, win: Window = window)
   const drawingsMemo = memoDrawings({ config, fetchFn, storage, now });
   const preloadImage = deps.preloadImage ?? preloadWithImage;
   let generation = 0;
+  /** The drawing on screen, `null` on the index or a status message: where a page turn starts from. */
+  let shownRkey: string | null = null;
+  /** The page turn in progress, skipped when a new render starts (page-turn-transition, decision 6). */
+  let turn: PageTurn | null = null;
   const header = deps.header ?? null;
   // Before the catalogue loads, so it is there in every status message.
   if (header) renderHeader(header, i18n);
@@ -82,9 +87,14 @@ export function startApp(root: HTMLElement, deps: AppDeps, win: Window = window)
     // Whatever is shown next, an open viewer belongs to the previous page.
     closeViewer();
     const gen = ++generation;
+    turn?.skipTransition();
+    turn = null;
     const isCurrent = () => gen === generation;
-    const show = (node: Node) => {
-      if (isCurrent()) root.replaceChildren(node);
+    /** Shows `node`; anything but a drawing (`rkey`) leaves no sheet to turn from. */
+    const show = (node: Node, rkey: string | null = null) => {
+      if (!isCurrent()) return;
+      root.replaceChildren(node);
+      shownRkey = rkey;
     };
     const route = parseRoute(win.location.hash);
     if (header) markCurrent(header, route.name === "index");
@@ -106,8 +116,15 @@ export function startApp(root: HTMLElement, deps: AppDeps, win: Window = window)
     if (!neighbours.current) return show(message("notFound", document.createTextNode(" "), el("a", { href: INDEX_HREF }, i18n.t("index"))));
 
     const view = renderDrawingShell({ drawing: neighbours.current, neighbours, config, i18n, now: now() });
-    show(view.element);
-    win.scrollTo?.(0, 0);
+    // The browser calls the update after capturing the old page. A prepared
+    // drawing is filled by then (below), so the new sheet arrives with its
+    // image (page-turn-transition, decision 4). Without a turn it runs at once.
+    turn = startPageTurn(win.document, win, turnDirection(drawings, shownRkey, rkey), async () => {
+      if (!isCurrent()) return;
+      show(view.element, rkey);
+      win.scrollTo?.(0, 0);
+      await imageDecoded(view.element.querySelector<HTMLImageElement>("img.post__image"));
+    });
 
     const data = await drawingsMemo.load(rkey);
     if (!isCurrent()) return; // otro dibujo ya ocupa la página
