@@ -70,26 +70,38 @@ Cada dibujo SHALL tener una URL estable basada en su rkey, que se pueda comparti
 - **THEN** ve un mensaje de dibujo no encontrado y un enlace al índice
 
 ### Requirement: Navegación al dibujo anterior y siguiente
-La página de un dibujo SHALL ofrecer enlaces al dibujo inmediatamente más antiguo y al inmediatamente más reciente según el orden del catálogo. El enlace que no tenga destino SHALL no mostrarse.
+The drawing page SHALL offer a link to the immediately older drawing and a link to the immediately newer drawing, in the catalogue's order, following the order of a book: since the newest drawing comes first, moving forward goes to older drawings. The link to the older drawing SHALL be the "next" one, shown at the right, and the link to the newer drawing SHALL be the "previous" one, shown at the left. Their accessible names SHALL come from the dictionary ("Seguinte" and "Anterior" in Galician). A link without a destination SHALL NOT be shown.
 
 #### Scenario: Dibujo intermedio
-- **WHEN** se muestra un dibujo que no es ni el más reciente ni el más antiguo
-- **THEN** hay enlace al anterior y al siguiente
+- **WHEN** a drawing that is neither the newest nor the oldest is shown
+- **THEN** there is a "previous" link at the left to the newer drawing and a "next" link at the right to the older drawing
 
 #### Scenario: Dibujo más reciente
-- **WHEN** se muestra el dibujo más reciente
-- **THEN** solo hay enlace al dibujo anterior (más antiguo)
+- **WHEN** the newest drawing is shown
+- **THEN** there is only the "next" link, at the right, to the older drawing
+
+#### Scenario: Dibujo más antiguo
+- **WHEN** the oldest drawing is shown
+- **THEN** there is only the "previous" link, at the left, to the newer drawing
+
+#### Scenario: Names of the links
+- **WHEN** a screen reader reads the links of an intermediate drawing
+- **THEN** the link to the older drawing is named "Seguinte" and the link to the newer one "Anterior"
 
 ### Requirement: Página de índice
-El sitio SHALL tener una página de índice, enlazada desde la página de dibujo, que liste todos los dibujos en el orden del catálogo. Cada entrada SHALL mostrar la miniatura de la primera imagen (si la tiene), el nombre atribuido y la fecha, y enlazar a la página del dibujo.
+The site SHALL have an index page, linked from the header of every page, that lists every drawing in the catalogue's order. Each entry SHALL show the thumbnail of the first image (if any), the attributed name and the date, and link to the drawing's page.
 
 #### Scenario: Abrir el índice
-- **WHEN** un visitante abre el índice
-- **THEN** ve todos los dibujos, cada uno con miniatura, nombre y fecha, y al pulsar uno llega a su página
+- **WHEN** a visitor opens the index
+- **THEN** they see every drawing, each with thumbnail, name and date, and tapping one takes them to its page
 
 #### Scenario: Dibujo sin imagen
-- **WHEN** un dibujo no tiene imagen
-- **THEN** su entrada del índice se muestra sin miniatura, con nombre y fecha
+- **WHEN** a drawing has no image
+- **THEN** its index entry is shown without a thumbnail, with name and date
+
+#### Scenario: Link from any page
+- **WHEN** a visitor is on a drawing, on the index or on a "drawing not found" page
+- **THEN** the header has a link to the index
 
 ### Requirement: Cambiar de dibujo muestra al instante lo que ya se conoce
 Al ir a otro dibujo desde las flechas o desde el índice, el sitio SHALL mostrar al momento su texto, su nombre, su fecha y los enlaces de navegación con los datos del catálogo, sin dejar la página vacía ni mostrar un aviso de carga a pantalla completa. La imagen, los contadores y las respuestas SHALL aparecer cuando estén disponibles.
