@@ -34,7 +34,7 @@ None.
 ## Impact
 
 - **Code:** `src/app.ts` (direction, building the shell before the transition, and wrapping the swap in a view transition) and a small module for the direction and the transition (`src/ui/page-turn.ts`). `src/drawing-loader.ts` does not change.
-- **Styles:** a new `components/page-turn.css` (the view-transition pseudo-elements and reduced motion), `view-transition-name`s for the sheet, the notes, the header and the pager, and a `--page-turn-duration` token in `theme.css`.
+- **Styles:** a new `components/page-turn.css` (the view-transition pseudo-elements and reduced motion), `view-transition-name`s for the sheet, the notes, the header and the pager, and the `--page-turn-duration` and `--page-turn-notes-duration` tokens in `theme.css`.
 - **Tests:** direction, the transition being used or not (with a fake `startViewTransition`, since jsdom has none), skipping on quick navigation, the attribute removed afterwards but never during a newer turn, and the style tests (tokens, reduced motion, no literal colours).
 - **No changes:** data, moderation, freshness, routes, CSP (no new resource, and the transition is styled only from the site's own stylesheet).
 - **Builds on** `page-navigation` (sheet and arrows as separate elements), already archived.

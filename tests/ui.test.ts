@@ -533,6 +533,15 @@ describe("page turn between drawings (page-turn-transition 2.2)", () => {
     expect(reduced.html.dataset.pageTurn).toBeUndefined();
   });
 
+  test("no turn between a drawing and a status message, either way", async () => {
+    const t = await start(`#/d/${NAIA.rkey}`);
+    await t.go("#/d/3n2zzzzzzzzzz"); // not in the catalogue
+    expect(t.root.textContent).toContain("Este desenho não existe.");
+    await t.go(`#/d/${VELLO}`);
+    expect(onPage(t.root)).toBe(VELLO);
+    expect(t.turns.started).toHaveLength(0);
+  });
+
   test("back twice during a turn: the first is skipped, its stale update shows nothing, and the page ends on the last hash", async () => {
     const t = await start("#/");
     await t.go(`#/d/${NAIA.rkey}`);
