@@ -89,7 +89,10 @@
   --viewer-gap: var(--space-4); /* space around the image in the viewer */
   --viewer-duration: 180ms; /* opening transition of the viewer */
   --page-turn-duration: 550ms; /* the sheet turning between drawings (page-turn.css) */
-  --page-turn-notes-duration: 200ms; /* each fade of the notes, before and after the turn */
+  --page-turn-notes-duration: 200ms; /* fade-out of the old notes as the turn starts */
+  --note-stick-duration: 450ms; /* bounce of a note sticking on (replies.css) */
+  --note-stick-stagger: 90ms; /* between replies that come into view together */
+  --note-stick-cascade: 180ms; /* between a note and the next one stuck on it */
 
   /* Hoja del dibujo */
   --sheet-width: 29.25rem; /* 468 px */

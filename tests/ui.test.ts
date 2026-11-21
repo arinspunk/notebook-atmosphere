@@ -23,6 +23,7 @@ import type { FetchFn } from "../src/xrpc.ts";
 import { closeViewer, isViewerState } from "../src/ui/viewer.ts";
 import { fakeImages, installDialogShim, nextPopState } from "./dialog-shim.ts";
 import { fakeMatchMedia, fakeViewTransitions } from "./view-transitions.ts";
+import { fakeIntersectionObservers } from "./intersection-observer.ts";
 
 installDialogShim();
 
@@ -175,13 +176,20 @@ function slowServer(over: Parameters<typeof server>[0] = {}) {
  * Ventana simulada: `go` cambia el hash y avisa a la app al momento (sin los `hashchange` asíncronos de jsdom).
  * With `turns`, its document has a fake `startViewTransition` and a `<html>` (page-turn-transition).
  */
-function fakeWindow(hash = "#/", { turns, reducedMotion = false }: { turns?: ReturnType<typeof fakeViewTransitions>; reducedMotion?: boolean } = {}) {
+function fakeWindow(
+  hash = "#/",
+  { turns, reducedMotion = false, observers }: { turns?: ReturnType<typeof fakeViewTransitions>; reducedMotion?: boolean; observers?: ReturnType<typeof fakeIntersectionObservers> } = {},
+) {
   const doc = Object.assign(
     new EventTarget(),
     { visibilityState: "visible" as DocumentVisibilityState },
     turns ? { documentElement: document.createElement("html"), startViewTransition: turns.startViewTransition } : {},
   );
-  const win = Object.assign(new EventTarget(), { location: { hash }, document: doc, scrollTo: () => {}, matchMedia: fakeMatchMedia(reducedMotion) });
+  const win = Object.assign(
+    new EventTarget(),
+    { location: { hash }, document: doc, scrollTo: () => {}, matchMedia: fakeMatchMedia(reducedMotion) },
+    observers ? { IntersectionObserver: observers.IntersectionObserver } : {},
+  );
   return {
     win: win as unknown as Window,
     doc,
@@ -571,6 +579,71 @@ describe("page turn between drawings (page-turn-transition 2.2)", () => {
     await vi.waitFor(() => expect(t.root.querySelector(".post__image")).not.toBeNull());
     expect(onPage(t.root)).toBe(NAIA.rkey);
     expect(t.turns.started).toHaveLength(0);
+  });
+});
+
+describe("notes stick on (notes-stick-bounce 1.2)", () => {
+  let stop: (() => void) | undefined;
+  afterEach(() => stop?.());
+
+  async function start(hash: string, { turns }: { turns?: ReturnType<typeof fakeViewTransitions> } = {}) {
+    const observers = fakeIntersectionObservers();
+    const w = fakeWindow(hash, { turns, observers });
+    const root = document.createElement("main");
+    const app = startApp(root, { config: CONFIG, fetchFn: server().fn, storage: null, now: () => NOW, preloadImage: () => {} }, w.win);
+    stop = app.stop;
+    await app.render();
+    const settle = () => new Promise((r) => setTimeout(r, 10));
+    const replies = () => root.querySelector<HTMLElement>(".replies");
+    return { root, observers, go: w.go, settle, replies };
+  }
+
+  test("after loading, the notes are armed and stick on when they come into view", async () => {
+    const t = await start(`#/d/${NAIA.rkey}`);
+    await t.settle();
+    expect(t.replies()!.classList.contains("replies--sticking")).toBe(true);
+    const threads = [...t.root.querySelectorAll(".replies__thread")];
+    expect(threads.length).toBeGreaterThan(0);
+    const [observer] = t.observers.created;
+    expect([...observer!.observed]).toEqual(threads);
+    observer!.report(threads);
+    expect(threads.every((th) => th.classList.contains("replies__thread--stuck"))).toBe(true);
+  });
+
+  test("after a page turn: armed before the update shows them, observed only when the turn finishes", async () => {
+    const page: { root?: Element } = {};
+    // What the update shows: the replies section's classes, right when it shows it.
+    const turns = fakeViewTransitions({ probe: () => page.root?.querySelector(".replies")?.className });
+    const t = await start("#/", { turns }); // León, whose older neighbour Naia has replies
+    page.root = t.root;
+    await t.settle(); // Naia prepared
+    t.go(`#/d/${NAIA.rkey}`);
+    await t.settle(); // the update ran; the turn has not finished
+    const [turn] = turns.started;
+    expect(turn!.probed).toBe("replies replies--sticking");
+    expect(t.observers.created).toHaveLength(0);
+    turn!.finish();
+    await t.settle();
+    expect(t.observers.created).toHaveLength(1);
+  });
+
+  test("navigating away stops the notes of the page left behind", async () => {
+    const t = await start(`#/d/${NAIA.rkey}`);
+    await t.settle();
+    const [observer] = t.observers.created;
+    expect(observer!.disconnected).toBe(false);
+    t.go("#/indice");
+    expect(observer!.disconnected).toBe(true);
+  });
+
+  test("without IntersectionObserver nothing is armed", async () => {
+    const w = fakeWindow(`#/d/${NAIA.rkey}`);
+    const root = document.createElement("main");
+    const app = startApp(root, { config: CONFIG, fetchFn: server().fn, storage: null, now: () => NOW, preloadImage: () => {} }, w.win);
+    stop = app.stop;
+    await app.render();
+    expect(root.querySelector(".replies")).not.toBeNull();
+    expect(root.querySelector(".replies--sticking")).toBeNull();
   });
 });
 

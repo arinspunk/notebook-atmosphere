@@ -250,10 +250,10 @@ describe("page turn (page-turn-transition 3.1)", () => {
     expect(pageTurnCss.trim()).not.toBe("");
     const animations = [...pageTurnCss.matchAll(/animation:\s*([^;]+);/g)].map((m) => m[1]!.trim());
     const animated = animations.filter((a) => a !== "none");
-    expect(animated.length).toBe(4); // sheet away, sheet back, notes out, notes in
+    expect(animated.length).toBe(3); // sheet away, sheet back, old notes out
     for (const a of animated) expect(TOKENS.some((t) => a.includes(`var(--${t})`)), a).toBe(true);
-    // The new notes wait for the sheet to land.
-    expect(animated).toContainEqual(expect.stringMatching(/var\(--page-turn-notes-duration\).*var\(--page-turn-duration\)/));
+    // The new notes are not animated here: they stick on after the turn (notes-stick-bounce).
+    expect(pageTurnCss).toMatch(/::view-transition-new\(notes\)\s*\{\s*animation:\s*none;\s*\}/);
     const props = cssCustomProperties(themeCss);
     for (const t of TOKENS) expect(resolveToken(props, t), t).toMatch(/^\d+m?s$/);
   });
@@ -269,8 +269,46 @@ describe("page turn (page-turn-transition 3.1)", () => {
     expect(start).toBeGreaterThan(-1);
     const block = pageTurnCss.slice(start);
     expect(block).toMatch(/animation:\s*none/);
-    for (const part of ['[data-page-turn="older"]::view-transition-old(sheet)', '[data-page-turn="newer"]::view-transition-new(sheet)', "::view-transition-old(notes)", "::view-transition-new(notes)"]) {
+    for (const part of ['[data-page-turn="older"]::view-transition-old(sheet)', '[data-page-turn="newer"]::view-transition-new(sheet)', "::view-transition-old(notes)"]) {
       expect(block, part).toContain(part);
+    }
+  });
+});
+
+describe("notes stick on (notes-stick-bounce 2.1)", () => {
+  const css = repliesCss.replace(/\/\*[\s\S]*?\*\//g, "");
+  const TOKENS = ["note-stick-duration", "note-stick-stagger", "note-stick-cascade"];
+
+  test("the bounce uses the three tokens, the order and the step, and the tokens resolve to times", () => {
+    const animated = [...css.matchAll(/animation:\s*([^;]+);/g)].map((m) => m[1]!.trim()).filter((a) => a !== "none");
+    expect(animated).toHaveLength(1);
+    for (const t of TOKENS) expect(animated[0]).toContain(`var(--${t})`);
+    expect(animated[0]).toContain("var(--note-stick-order");
+    expect(animated[0]).toContain("var(--note-stick-step");
+    const props = cssCustomProperties(themeCss);
+    for (const t of TOKENS) expect(resolveToken(props, t), t).toMatch(/^\d+m?s$/);
+  });
+
+  test("each note is hidden and bounces on its own, not the whole thread (cascade)", () => {
+    expect(css).toMatch(/\.replies--sticking \.reply\s*\{\s*opacity:\s*0;/);
+    expect(css).toMatch(/\.replies--sticking \.replies__thread--stuck \.reply\s*\{[^}]*animation:\s*note-stick/);
+    expect(css).not.toMatch(/\.replies--sticking \.replies__thread\s*\{/);
+  });
+
+  test("its keyframes animate only scale and opacity, so the tilt and zigzag stay", () => {
+    const keyframes = /@keyframes\s+note-stick\s*\{([\s\S]*?)\n\}/.exec(css)?.[1];
+    expect(keyframes).toBeDefined();
+    const props = new Set([...keyframes!.matchAll(/([\w-]+)\s*:/g)].map((m) => m[1]));
+    expect([...props].sort()).toEqual(["opacity", "scale"]);
+  });
+
+  test("with reduced motion and on paper every note is shown, without animation", () => {
+    for (const media of [/@media\s*\(prefers-reduced-motion:\s*reduce\)/, /@media\s+print/]) {
+      const start = css.search(media);
+      expect(start, String(media)).toBeGreaterThan(-1);
+      const block = css.slice(start, css.indexOf("\n}", start));
+      expect(block).toMatch(/opacity:\s*1/);
+      expect(block).toMatch(/animation:\s*none/);
     }
   });
 });

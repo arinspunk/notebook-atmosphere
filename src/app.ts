@@ -23,6 +23,7 @@ import { renderDrawingShell } from "./ui/drawing-view.ts";
 import { markCurrent, renderHeader } from "./ui/header.ts";
 import { loadThumbnails, renderIndex } from "./ui/index-view.ts";
 import { imageDecoded, startPageTurn, turnDirection, type PageTurn } from "./ui/page-turn.ts";
+import { stickNotes } from "./ui/note-stick.ts";
 import { closeViewer, isViewerState } from "./ui/viewer.ts";
 import type { FetchFn } from "./xrpc.ts";
 
@@ -72,6 +73,8 @@ export function startApp(root: HTMLElement, deps: AppDeps, win: Window = window)
   let shownRkey: string | null = null;
   /** The page turn in progress, skipped when a new render starts (page-turn-transition, decision 6). */
   let turn: PageTurn | null = null;
+  /** Stops the current page's notes from sticking on (notes-stick-bounce, decision 4). */
+  let stopNotes = () => {};
   const header = deps.header ?? null;
   // Before the catalogue loads, so it is there in every status message.
   if (header) renderHeader(header, i18n);
@@ -89,6 +92,7 @@ export function startApp(root: HTMLElement, deps: AppDeps, win: Window = window)
     const gen = ++generation;
     turn?.skipTransition();
     turn = null;
+    stopNotes();
     const isCurrent = () => gen === generation;
     /** Shows `node`; anything but a drawing (`rkey`) leaves no sheet to turn from. */
     const show = (node: Node, rkey: string | null = null) => {
@@ -129,7 +133,9 @@ export function startApp(root: HTMLElement, deps: AppDeps, win: Window = window)
     const data = await drawingsMemo.load(rkey);
     if (!isCurrent()) return; // otro dibujo ya ocupa la página
     if (data.state === "error") return view.fail();
-    view.fill(data.post, data.cards);
+    const notes = view.fill(data.post, data.cards);
+    // After the page turn, if one is running: its notes are hidden until then.
+    if (notes) stopNotes = stickNotes(notes, win, turn?.finished);
     prefetch([neighbours.older, neighbours.newer]);
   }
 

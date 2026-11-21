@@ -122,8 +122,8 @@ export interface DrawingShellInput {
 export interface DrawingShell {
   /** The `drawing` block: the sheet (`post` and its arrows) and, after it, the replies. */
   element: HTMLElement;
-  /** Coloca la imagen en su hueco, los contadores y las tarjetas. */
-  fill(post: PostView, cards: Card[]): void;
+  /** Coloca la imagen en su hueco, los contadores y las tarjetas. Returns the replies section, if any. */
+  fill(post: PostView, cards: Card[]): HTMLElement | null;
   /** Pone el mensaje de error en lugar de la imagen y las respuestas. */
   fail(): void;
 }
@@ -183,6 +183,7 @@ export function renderDrawingShell({ drawing, neighbours, config, i18n, now }: D
       );
       const section = renderCards(cards, config, i18n, now);
       if (section) element.append(section); // after the sheet, inside `drawing`
+      return section;
     },
     fail() {
       replaceFigure(el("p", { class: "status status--error", role: "status" }, i18n.t("threadError")));

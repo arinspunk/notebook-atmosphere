@@ -130,3 +130,62 @@
   --note: var(--note-own);
   --note-ink: var(--note-own-ink);
 }
+
+/*
+ * Notes that stick on with a bounce the first time they come into view
+ * (notes-stick-bounce). `src/ui/note-stick.ts` arms the block with
+ * `replies--sticking` only when it will reveal the notes, and marks each
+ * thread `replies__thread--stuck` as it enters the screen, with its place
+ * among the threads entering together in `--note-stick-order`. Unarmed, the
+ * notes are shown as they are.
+ *
+ * Each note bounces on its own: the reply first, then the notes stuck on it,
+ * one by one, by their `--note-stick-step` (0 for the reply). The bounce
+ * animates only `scale` and `opacity`, which compose with the `rotate` and
+ * `translate` of threads and notes, so each note keeps its tilt and zigzag.
+ */
+.replies--sticking .reply {
+  opacity: 0;
+}
+
+.replies--sticking .replies__thread--stuck .reply {
+  opacity: 1;
+  animation: note-stick var(--note-stick-duration) ease-out
+    calc(var(--note-stick-order, 0) * var(--note-stick-stagger) + var(--note-stick-step, 0) * var(--note-stick-cascade)) both;
+}
+
+@keyframes note-stick {
+  0% {
+    scale: 1.12; /* lifted, closer to the visitor */
+    opacity: 0;
+  }
+
+  45% {
+    scale: 0.97; /* pressed onto the page */
+    opacity: 1;
+  }
+
+  70% {
+    scale: 1.015;
+  }
+
+  100% {
+    scale: 1;
+  }
+}
+
+/* The app does not arm with reduced motion; this is the backstop. */
+@media (prefers-reduced-motion: reduce) {
+  .replies--sticking .reply {
+    opacity: 1;
+    animation: none;
+  }
+}
+
+/* On paper every note is there, whether it was scrolled into view or not. */
+@media print {
+  .replies--sticking .reply {
+    opacity: 1;
+    animation: none;
+  }
+}

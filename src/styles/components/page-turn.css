@@ -8,8 +8,9 @@
  *   the old sheet turns away on top, showing its blank back past edge-on,
  *   and uncovers the new one; towards a newer one, the new sheet comes back
  *   from edge-on (-90deg) and lands on top of the old one.
- * - The notes never turn: the old ones fade out as the turn starts, and the
- *   new ones fade in once the sheet has landed.
+ * - The notes never turn: the old ones fade out as the turn starts. The new
+ *   ones are hidden until the turn ends and then stick on (replies.css,
+ *   notes-stick-bounce), so their snapshot is not animated here.
  * - The header and the arrows are named so they stay out of the page's
  *   cross-fade; the arrows jump at once to their new place, like the sheet.
  */
@@ -123,18 +124,13 @@
   animation: page-turn-fade-out var(--page-turn-notes-duration) ease-out both;
 }
 
+/* Kept, with no animation: without it the browser's default fade-in would apply. */
 :root[data-page-turn]::view-transition-new(notes) {
-  animation: page-turn-fade-in var(--page-turn-notes-duration) ease-in var(--page-turn-duration) both;
+  animation: none;
 }
 
 @keyframes page-turn-fade-out {
   to {
-    opacity: 0;
-  }
-}
-
-@keyframes page-turn-fade-in {
-  from {
     opacity: 0;
   }
 }
@@ -146,8 +142,7 @@
 @media (prefers-reduced-motion: reduce) {
   :root[data-page-turn="older"]::view-transition-old(sheet),
   :root[data-page-turn="newer"]::view-transition-new(sheet),
-  :root[data-page-turn]::view-transition-old(notes),
-  :root[data-page-turn]::view-transition-new(notes) {
+  :root[data-page-turn]::view-transition-old(notes) {
     animation: none;
   }
 }
